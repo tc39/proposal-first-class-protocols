@@ -1,12 +1,12 @@
-export class Ordering {
+class Ordering {
   static LT = new Ordering;
   static EQ = new Ordering;
   static GT = new Ordering;
 }
 
-export class Ordered {
+interface Ordered {
   // :: (this :: a, other :: a) -> Ordering
-  static compare = Symbol("Ord.compare");
+  compare;
 
   // :: (this :: a, other :: a) -> Boolean
   lessThan(other) {
@@ -14,9 +14,9 @@ export class Ordered {
   }
 }
 
-export class Functor {
+interface Functor {
   // :: (this :: f a, fn :: a -> b) -> f b
-  static map = Symbol("Functor.map");
+  map;
 
   // :: (this :: f a) -> f Unit
   void() {
@@ -24,9 +24,9 @@ export class Functor {
   }
 }
 
-export class Apply with Functor {
+interface Apply extends Functor {
   // :: (this :: f a, fn :: f (a -> b)) -> f b
-  static apply = Symbol("Apply.apply");
+  apply;
 
   // :: (this :: f a, fn :: (this :: a -> other :: b -> c), other :: f b) -> f c
   lift2(fn, other) {
@@ -34,33 +34,32 @@ export class Apply with Functor {
   }
 }
 
-export class Applicative with Apply {
-  // WARN: must be installed statically
+interface Applicative extends Apply {
   // :: (this :: f, v :: a) -> f a
-  static pure = Symbol("static Applicative.pure");
+  static pure;
 }
 
-export class Bind with Apply {
-  static bind = Symbol("Bind.bind");
+interface Bind extends Apply {
+  bind;
 
   join() {
     return this[Bind.bind](x -> x);
   }
 }
 
-export class Monad with Applicative, Bind {}
+interface Monad extends Applicative extends Bind {}
 
-export class Semigroup {
-  static append = Symbol("Semigroup.append");
+interface Semigroup {
+  // :: (this :: a, other :: a) -> a
+  append;
 }
 
-export class Monoid with Semigroup {
-  // WARN: must be installed statically
+interface Monoid extends Semigroup {
   // :: a
-  static unit = Symbol("static Monoid.unit");
+  static unit;
 }
 
-export class MonadPlus with Monad, Monoid {}
+interace MonadPlus extends Monad extends Monoid {}
 
 
 Array.prototype[Functor.map] = Array.prototype.map;
@@ -87,7 +86,7 @@ Array.prototype[Semigroup.append] = Array.prototype.concat;
 Array[Monoid.unit] = [];
 
 
-class Maybe with Monad {
+class Maybe implements Monad {
   static [Applicative.pure](v) {
     return new Just(v);
   }
