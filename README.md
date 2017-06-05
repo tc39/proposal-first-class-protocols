@@ -37,7 +37,7 @@ instance.youGetThisMethodForFree();
 ## How can I play with it?
 
 A prototype using [sweet.js](https://www.sweetjs.org/) is available at
-https://github.com/disnet/sweet-algebras
+https://github.com/disnet/sweet-interfaces
 
 
 ## What is it used for?
@@ -237,7 +237,7 @@ interface Monoid {
 
 ## Details
 
-See the tests in https://github.com/disnet/sweet-algebras/tree/master/test for
+See the tests in https://github.com/disnet/sweet-interfaces/tree/master/test for
 specific details about the proposal.
 
 
