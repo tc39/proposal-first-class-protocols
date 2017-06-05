@@ -249,7 +249,7 @@ specific details about the proposal.
 1. `export interface ...` form?
 
 
-## Relationship to similar features in other languages
+## Relationship to similar features
 
 ### Haskell-style typeclasses
 
@@ -263,10 +263,14 @@ TODO
 
 TODO
 
-### ECMAScript mixin() pattern
+### ECMAScript `mixin(...)` pattern
 
 ```js
 class A extends mixin(FeatureA, FeatureB) {}
 ```
+
+TODO
+
+### ECMAScript proposed bind (`::`) operator
 
 TODO
