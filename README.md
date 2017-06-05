@@ -34,6 +34,12 @@ instance.youGetThisMethodForFree();
 ```
 
 
+### How can I play with it?
+
+A prototype using [sweet.js](https://www.sweetjs.org/) is available at
+https://github.com/disnet/sweet-algebras
+
+
 ### What is it used for?
 
 The most well-known protocol in ECMAScript is the iteration protocol. APIs such
@@ -108,12 +114,6 @@ interface Ordered {
 String.prototype[Ordered.compare] = function() { /* elided */ };
 String implements Ordered;
 ```
-
-
-### How can I play with it?
-
-A prototype using [sweet.js](https://www.sweetjs.org/) is available at
-https://github.com/disnet/sweet-algebras
 
 
 ### Features
@@ -235,6 +235,12 @@ interface Monoid {
 ```
 
 
+### Details
+
+See the tests in https://github.com/disnet/sweet-algebras/tree/master/test for
+specific details about the proposal.
+
+
 ### Open questions or issues
 
 1. Should method names be symbols like fields?
@@ -254,5 +260,13 @@ TODO
 TODO
 
 #### Ruby-style mixins
+
+TODO
+
+#### ECMAScript mixin() pattern
+
+```js
+class A extends mixin(FeatureA, FeatureB) {}
+```
 
 TODO
