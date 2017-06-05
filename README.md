@@ -240,9 +240,19 @@ interface Monoid {
 1. Should method names be symbols like fields?
 1. Relatedly, if we stick with strings, what do we do about method names that conflict with existing ones on the implementer?
 1. Do we want to have a way to query whether a class implements an interface?
+1. `export interface ...` form?
 
 
 ### Relationship to similar features in other languages
 
 #### Haskell-style typeclasses
+
+TODO
+
 #### Java-style interfaces
+
+TODO
+
+#### Ruby-style mixins
+
+TODO
