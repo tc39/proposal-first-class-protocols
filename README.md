@@ -10,7 +10,7 @@ design.
 The proposal has not yet been brought before TC39 and is therefore **Stage 0**.
 It is on the [July 2017 agenda](https://github.com/tc39/agendas/blob/master/2017/07.md).
 
-### What does it look like?
+## What does it look like?
 
 ```js
 interface InterfaceName {
@@ -34,13 +34,13 @@ instance.youGetThisMethodForFree();
 ```
 
 
-### How can I play with it?
+## How can I play with it?
 
 A prototype using [sweet.js](https://www.sweetjs.org/) is available at
 https://github.com/disnet/sweet-algebras
 
 
-### What is it used for?
+## What is it used for?
 
 The most well-known protocol in ECMAScript is the iteration protocol. APIs such
 as `Array.from`, the `Map` and `Set` constructors, destructuring syntax, and
@@ -116,9 +116,9 @@ String implements Ordered;
 ```
 
 
-### Features
+## Features
 
-#### interface inheritance
+### interface inheritance
 
 Interfaces may extend other interfaces. This expresses a dependency
 relationship between the interfaces.
@@ -141,7 +141,7 @@ In the example above, notice how B extends A and any class that implements B
 must also implement A.
 
 
-#### interfaces throw when not fully implemented
+### interfaces throw when not fully implemented
 
 If a class that is implementing an interface is missing some of the required
 fields, it will fail at class definition time. This program will throw:
@@ -155,7 +155,7 @@ class C implements I {
 }
 ```
 
-#### minimal implementations
+### minimal implementations
 
 Minimal implementations can be expressed using interface inheritance.
 
@@ -183,7 +183,7 @@ class D implements MonadViaJoin {
 }
 ```
 
-#### `implements` operator
+### `implements` operator
 
 An important aspect of this proposal is that it needs to be possible to apply
 an interface to an existing class.
@@ -210,7 +210,7 @@ C implements A;
 C implements B;
 ```
 
-#### static fields and methods
+### static fields and methods
 
 Some interfaces require their methods to be put on the constructor instead of
 the prototype. Use the `static` modifier for this.
@@ -235,13 +235,13 @@ interface Monoid {
 ```
 
 
-### Details
+## Details
 
 See the tests in https://github.com/disnet/sweet-algebras/tree/master/test for
 specific details about the proposal.
 
 
-### Open questions or issues
+## Open questions or issues
 
 1. Should method names be symbols like fields?
 1. Relatedly, if we stick with strings, what do we do about method names that conflict with existing ones on the implementer?
@@ -249,21 +249,21 @@ specific details about the proposal.
 1. `export interface ...` form?
 
 
-### Relationship to similar features in other languages
+## Relationship to similar features in other languages
 
-#### Haskell-style typeclasses
-
-TODO
-
-#### Java-style interfaces
+### Haskell-style typeclasses
 
 TODO
 
-#### Ruby-style mixins
+### Java-style interfaces
 
 TODO
 
-#### ECMAScript mixin() pattern
+### Ruby-style mixins
+
+TODO
+
+### ECMAScript mixin() pattern
 
 ```js
 class A extends mixin(FeatureA, FeatureB) {}
