@@ -14,7 +14,7 @@ It is on the [July 2017 agenda](https://github.com/tc39/agendas/blob/master/2017
 
 ```js
 interface InterfaceName {
-  // declare a symbol which much be implemented
+  // declare a symbol which must be implemented
   thisMustBeImplemented;
 
   // and some methods that you get for free by implementing this interface
