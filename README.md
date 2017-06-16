@@ -247,6 +247,7 @@ specific details about the proposal.
 1. Relatedly, if we stick with strings, what do we do about method names that conflict with existing ones on the implementer?
 1. Do we want to have a way to query whether a class implements an interface?
 1. `export interface ...` form?
+1. Should interfaces be immutable prototype exotic objects? Frozen?
 
 
 ## Relationship to similar features
