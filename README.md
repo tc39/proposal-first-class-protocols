@@ -234,6 +234,18 @@ interface Monoid {
 }
 ```
 
+### combined export form
+
+To mirror the existing combined declaration/export forms like `export class C {}`,
+`export function f() {}`, etc., interfaces can be simultaneously declared and
+exported using a similar combined form.
+
+```js
+export interface I {
+  // ...
+}
+```
+
 
 ## Details
 
@@ -246,7 +258,6 @@ specific details about the proposal.
 1. Should method names be symbols like fields?
 1. Relatedly, if we stick with strings, what do we do about method names that conflict with existing ones on the implementer?
 1. Do we want to have a way to query whether a class implements an interface?
-1. `export interface ...` form?
 1. Should interfaces be immutable prototype exotic objects? Frozen?
 
 
