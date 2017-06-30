@@ -58,7 +58,7 @@ interface ToString {
 }
 
 Object.prototype[ToString.tag] = 'Object';
-Object implements ToString;
+Reflect.implement(Object, ToString);
 ```
 
 The auto-flattening behaviour of `Promise.prototype.then` was a very controversial decision.
@@ -86,7 +86,7 @@ Promise.prototype[Monad.bind] = function (f) {
     return new Identity(f.apply(this, args));
   }).unwrap();
 }
-Promise implements Monad;
+Reflect.implement(Promise, Monad);
 ```
 
 Finally, one of the biggest benefits of interfaces is that they eliminate the
@@ -112,7 +112,7 @@ interface Ordered {
 }
 
 String.prototype[Ordered.compare] = function() { /* elided */ };
-String implements Ordered;
+Reflect.implement(String, Ordered);
 ```
 
 
@@ -183,7 +183,7 @@ class D implements MonadViaJoin {
 }
 ```
 
-### `implements` operator
+### `Reflect.implement`
 
 An important aspect of this proposal is that it needs to be possible to apply
 an interface to an existing class.
@@ -194,21 +194,25 @@ interface Functor {
 }
 
 Array.prototype[Functor.map] = Array.prototype.map;
-Array implements Functor;
+Reflect.implement(Array, Functor);
 ```
 
-The `implements` operator returns its left operand to allow for chaining.
+### `implements` operator
+
+The `implements` operator returns `true` if and only if a given class provides
+the fields required to implement a given interface.
 
 ```js
-C implements A implements B;
+interface I { a; b() {} }
+interface K { a; b() {} }
+
+class C { [I.a]() {} }
+
+C implements I; // true
+C implements K; // false
 ```
 
-is equivalent to
-
-```js
-C implements A;
-C implements B;
-```
+TODO: Do we also want to require the class to have implemented the interface?
 
 ### static fields and methods
 
@@ -257,8 +261,8 @@ specific details about the proposal.
 
 1. Should method names be symbols like fields?
 1. Relatedly, if we stick with strings, what do we do about method names that conflict with existing ones on the implementer?
-1. Do we want to have a way to query whether a class implements an interface?
 1. Should interfaces be immutable prototype exotic objects? Frozen?
+1. Do we want to have interfaces inherit from some `Interface.prototype` object so they can be abstracted over?
 
 
 ## Relationship to similar features

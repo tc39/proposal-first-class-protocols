@@ -54,4 +54,4 @@ Array.prototype[Bind.bind] = function bind(f) {
   return result;
 };
 
-Array implements Monad;
+Reflect.implement(Array, Monad);

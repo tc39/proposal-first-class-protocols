@@ -18,4 +18,4 @@ String.prototype[Ordered.compare] = function compare(other) {
   if (other < this) return Ordering.GT;
   return Ordering.EQ;
 };
-String implements Ordered;
+Reflect.implement(String, Ordered);

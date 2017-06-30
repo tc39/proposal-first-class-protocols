@@ -10,4 +10,4 @@ interface Monoid extends Semigroup {
 
 Array.prototype[Semigroup.append] = Array.prototype.concat;
 Array[Monoid.unit] = [];
-Array implements Monoid;
+Reflect.implement(Array, Monoid);
