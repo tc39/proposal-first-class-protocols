@@ -19,7 +19,7 @@ class SetUsingHashCode extends Set {
 }
 
 class Identity implements HasHashCode {
-  [HashHashCode.hashCode]() { return this.val; }
+  [HasHashCode.hashCode]() { return this.val; }
   constructor(val) { this.val = val; }
 }
 
