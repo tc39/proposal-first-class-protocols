@@ -30,7 +30,7 @@ class ClassName implements InterfaceName {
 }
 
 let instance = new ClassName;
-instance.youGetThisMethodForFree();
+instance[InterfaceName.youGetThisMethodForFree]();
 ```
 
 
@@ -225,7 +225,7 @@ interface A {
 }
 
 class C implements A { }
-C.b();
+C[A.b]();
 ```
 
 Similarly, require an interface field to be on the constructor instead of the
@@ -259,8 +259,6 @@ specific details about the proposal.
 
 ## Open questions or issues
 
-1. Should method names be symbols like fields?
-1. Relatedly, if we stick with strings, what do we do about method names that conflict with existing ones on the implementer?
 1. Should interfaces be immutable prototype exotic objects? Frozen?
 1. Do we want to have interfaces inherit from some `Interface.prototype` object so they can be abstracted over?
 
