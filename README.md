@@ -271,6 +271,10 @@ specific details about the proposal.
 
 TODO
 
+### Rust traits
+
+TODO
+
 ### Java-style interfaces
 
 TODO
