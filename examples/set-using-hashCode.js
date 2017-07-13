@@ -1,4 +1,4 @@
-interface HasHashCode {
+protocol HasHashCode {
   hashCode;
 }
 

@@ -13,7 +13,7 @@ It is on the [July 2017 agenda](https://github.com/tc39/agendas/blob/master/2017
 ## What does it look like?
 
 ```js
-interface InterfaceName {
+protocol InterfaceName {
   // declare a symbol which must be implemented
   thisMustBeImplemented;
 
@@ -49,7 +49,7 @@ For example, the protocol defined by `Symbol.toStringTag` could have been
 expressed using interfaces as
 
 ```js
-interface ToString {
+protocol ToString {
   tag;
 
   toString() {
@@ -72,7 +72,7 @@ Interfaces eliminate this issue in two ways:
 
 ```js
 // Applicative elided here
-interface Monad extends Applicative {
+protocol Monad extends Applicative {
   bind;
 }
 
@@ -103,7 +103,7 @@ class Ordering {
   static GT = new Ordering;
 }
 
-interface Ordered {
+protocol Ordered {
   compare;
 
   lessThan(other) {
@@ -124,8 +124,8 @@ Interfaces may extend other interfaces. This expresses a dependency
 relationship between the interfaces.
 
 ```js
-interface A { a; }
-interface B extends A { b; }
+protocol A { a; }
+protocol B extends A { b; }
 
 class C implements B {
   [A.a]() {}
@@ -147,7 +147,7 @@ If a class that is implementing an interface is missing some of the required
 fields, it will fail at class definition time. This program will throw:
 
 ```js
-interface I { a; b; }
+protocol I { a; b; }
 
 class C implements I {
   [I.a]() {}
@@ -161,17 +161,17 @@ Minimal implementations can be expressed using interface inheritance.
 
 ```js
 // Applicative elided
-interface Monad extends Applicative {
+protocol Monad extends Applicative {
   bind;
   join;
   kleisli() {}
 }
 
 // two possible minimal implementations for Monad
-interface MonadViaBind extends Monad {
+protocol MonadViaBind extends Monad {
   [Monad.join]() { /* default implementation in terms of bind elided */ }
 }
-interface MonadViaJoin extends Monad {
+protocol MonadViaJoin extends Monad {
   [Monad.bind]() { /* default implementation in terms of join elided */ }
 }
 
@@ -189,7 +189,7 @@ An important aspect of this proposal is that it needs to be possible to apply
 an interface to an existing class.
 
 ```js
-interface Functor {
+protocol Functor {
   map;
 }
 
@@ -203,8 +203,8 @@ The `implements` operator returns `true` if and only if a given class provides
 the fields required to implement a given interface.
 
 ```js
-interface I { a; b() {} }
-interface K { a; b() {} }
+protocol I { a; b() {} }
+protocol K { a; b() {} }
 
 class C { [I.a]() {} }
 
@@ -220,7 +220,7 @@ Some interfaces require their methods to be put on the constructor instead of
 the prototype. Use the `static` modifier for this.
 
 ```js
-interface A {
+protocol A {
   static b() {}
 }
 
@@ -232,7 +232,7 @@ Similarly, require an interface field to be on the constructor instead of the
 prototype using the `static` modifier.
 
 ```js
-interface Monoid {
+protocol Monoid {
   concat;
   static identity;
 }
@@ -245,7 +245,7 @@ To mirror the existing combined declaration/export forms like `export class C {}
 exported using a similar combined form.
 
 ```js
-export interface I {
+export protocol I {
   // ...
 }
 ```

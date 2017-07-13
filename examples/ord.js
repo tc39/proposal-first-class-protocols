@@ -3,7 +3,7 @@ Ordering.LT = new Ordering;
 Ordering.EQ = new Ordering;
 Ordering.GT = new Ordering;
 
-interface Ordered {
+protocol Ordered {
   // :: (this :: a, other :: a) -> Ordering
   compare;
 

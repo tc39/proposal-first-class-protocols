@@ -1,4 +1,4 @@
-interface Functor {
+protocol Functor {
   // :: (this :: f a, fn :: a -> b) -> f b
   map;
 
@@ -8,7 +8,7 @@ interface Functor {
   }
 }
 
-interface Apply extends Functor {
+protocol Apply extends Functor {
   // :: (this :: f a, fn :: f (a -> b)) -> f b
   apply;
 
@@ -18,12 +18,12 @@ interface Apply extends Functor {
   }
 }
 
-interface Applicative extends Apply {
+protocol Applicative extends Apply {
   // :: (this :: f, v :: a) -> f a
   static pure;
 }
 
-interface Bind extends Apply {
+protocol Bind extends Apply {
   bind;
 
   join() {
@@ -31,7 +31,7 @@ interface Bind extends Apply {
   }
 }
 
-interface Monad extends Applicative, Bind {}
+protocol Monad extends Applicative, Bind {}
 
 
 Array.prototype[Functor.map] = Array.prototype.map;

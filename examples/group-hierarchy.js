@@ -1,9 +1,9 @@
-interface Semigroup {
+protocol Semigroup {
   // :: (this :: a, other :: a) -> a
   append;
 }
 
-interface Monoid extends Semigroup {
+protocol Monoid extends Semigroup {
   // :: a
   static unit;
 }
