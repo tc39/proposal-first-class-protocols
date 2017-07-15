@@ -197,6 +197,18 @@ Array.prototype[Functor.map] = Array.prototype.map;
 Reflect.implement(Array, Functor);
 ```
 
+`Reflect.implement` accepts zero or more interfaces following the class.
+
+```js
+interface I {}
+interface K {}
+
+// these are all the same
+let c = Reflect.implement(Reflect.implement(class C {}, I), K);
+let c = Reflect.implement(class C {}, I, K);
+class C implements I implements K {}
+```
+
 ### `implements` operator
 
 The `implements` operator returns `true` if and only if a given class provides
