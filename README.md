@@ -116,6 +116,18 @@ Reflect.implement(String, Ordered);
 ```
 
 
+## Why not use the `interface` keyword?
+
+The initial version of this proposal used the `interface` keyword in place of
+the `protocol` contextual keyword that is used currently. This decision was
+made to avoid ecosystem breakage caused by conflicting with TypeScript's usage
+of the `interface` keyword.
+
+This incompatibility and its effects on the growth of the language are a
+serious concern, and should be addressed by the committee. But for now we will
+be pragmatic and work around the issue. See https://twitter.com/jspedant/status/871875746041446400.
+
+
 ## Features
 
 ### interface inheritance
