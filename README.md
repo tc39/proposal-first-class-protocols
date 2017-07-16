@@ -212,19 +212,28 @@ class C implements I implements K {}
 ### `implements` operator
 
 The `implements` operator returns `true` if and only if a given class provides
-the fields required to implement a given interface.
+the fields required to implement a given interface as well as the methods
+obtained from implementing the interface.
 
 ```js
 protocol I { a; b() {} }
 protocol K { a; b() {} }
 
 class C { [I.a]() {} }
-
-C implements I; // true
+C implements I; // false
 C implements K; // false
-```
 
-TODO: Do we also want to require the class to have implemented the interface?
+class D implements I { [I.a]() {} }
+D implements I; // true
+D implements K; // false
+
+class E {
+  [I.a]() {}
+  [I.b]() {}
+}
+E implements I; // true
+E implements K; // false
+```
 
 ### static fields and methods
 
