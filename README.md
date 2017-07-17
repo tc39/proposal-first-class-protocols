@@ -298,30 +298,62 @@ specific details about the proposal.
 
 ## Relationship to similar features
 
-### Haskell-style typeclasses
+### Haskell type classes
 
-TODO
+This proposal was strongly inspired by Haskell's type classes. The conceptual
+model is identical aside from the fact that in Haskell the type class instance
+(essentially an implicit record) is resolved automatically by the type checker.
+For a more Haskell-like calling pattern, one can define functions like
+
+```js
+function fmap(fn) {
+  return function (functor) {
+    return functor[Functor.fmap](fn);
+  };
+}
+```
+
+Similar to how each type in Haskell may only have a single implementation of
+each type class (newtypes are used as a workaround), each class in JavaScript
+may only have a single implementation of each interface.
+
+Haskell type classes exist only at the type level and not the term level, so they
+cannot be passed around as first class values, and any abstraction over them must
+be done through type-level programming mechanisms. The interfaces in this proposal
+are themselves values which may be passed around as first class citizens.
 
 ### Rust traits
 
+Rust traits are very similar to Haskell type classes. Rust traits have
+restrictions on implementations for built-in data structures; no such
+restriction exists with this proposal. The `implements` operator in this
+proposal would be useful in manually guarding a function in a way that Rust's
+trait bounds do. Default methods in Rust traits are equivalent to what we've
+called methods in this proposal.
+
+### Java interfaces
+
 TODO
 
-### Java-style interfaces
-
-TODO
-
-### Ruby-style mixins
+### Ruby mixins
 
 TODO
 
 ### ECMAScript `mixin(...)` pattern
 
 ```js
-class A extends mixin(FeatureA, FeatureB) {}
+class A extends mixin(SuperClass, FeatureA, FeatureB) {}
 ```
 
-TODO
+This mixin pattern usually ends up creating one or more intermediate prototype
+objects which sit between the class and its superclass on the prototype chain.
+In contrast, this proposal works by copying the inherited interface methods
+into the class or its prototype. This proposal is also built entirely off of
+Symbol-named properties, but doing so using existing mechanisms would be
+tedious and difficult to do properly. For an example of the complexity involved
+in doing it properly, see the output of the sweet.js implementation.
 
-### ECMAScript proposed bind (`::`) operator
+
+## Links to previous related discussions/strawmen
 
 TODO
