@@ -212,8 +212,8 @@ Reflect.implement(Array, Functor);
 `Reflect.implement` accepts zero or more interfaces following the class.
 
 ```js
-interface I {}
-interface K {}
+protocol I {}
+protocol K {}
 
 // these are all the same
 let c = Reflect.implement(Reflect.implement(class C {}, I), K);
