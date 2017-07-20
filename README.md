@@ -294,6 +294,7 @@ specific details about the proposal.
 
 1. Should interfaces be immutable prototype exotic objects? Frozen?
 1. Do we want to have interfaces inherit from some `Interface.prototype` object so they can be abstracted over?
+1. Is there a way we can make `super` properties and `super` calls work?
 
 
 ## Relationship to similar features
