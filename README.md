@@ -231,11 +231,15 @@ obtained from implementing the interface.
 protocol I { a; b() {} }
 protocol K { a; b() {} }
 
-class C { [I.a]() {} }
+class C {
+  [I.a]() {}
+}
 C implements I; // false
 C implements K; // false
 
-class D implements I { [I.a]() {} }
+class D implements I {
+  [I.a]() {}
+}
 D implements I; // true
 D implements K; // false
 
