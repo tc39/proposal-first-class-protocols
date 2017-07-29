@@ -8,7 +8,9 @@ proposal is to provide a convenient syntactic facility for protocol-based
 design.
 
 The proposal has not yet been brought before TC39 and is therefore **Stage 0**.
-It is on the [July 2017 agenda](https://github.com/tc39/agendas/blob/master/2017/07.md).
+It was on the [July 2017 agenda](https://github.com/tc39/agendas/blob/master/2017/07.md),
+but was postponed until [September 2017](https://github.com/tc39/agendas/blob/master/2017/09.md)
+due to time constraints.
 
 ## What does it look like?
 
