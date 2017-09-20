@@ -1,5 +1,5 @@
-ECMAScript Interfaces Proposal
-==============================
+ECMAScript First-Class Protocols Proposal
+=========================================
 
 As of ES2015, new ECMAScript standard library APIs have used a protocol-based
 design, enabled by the introduction of Symbols. Symbols are ECMAScript values
@@ -15,24 +15,24 @@ due to time constraints.
 ## What does it look like?
 
 ```js
-protocol InterfaceName {
+protocol ProtocolName {
   // declare a symbol which must be implemented
   thisMustBeImplemented;
 
-  // and some methods that you get for free by implementing this interface
+  // and some methods that you get for free by implementing this protocol
   youGetThisMethodForFree(...parameters) {
       methodBody;
   }
 }
 
-class ClassName implements InterfaceName {
-  [InterfaceName.thisMustBeImplemented]() {
+class ClassName implements ProtocolName {
+  [ProtocolName.thisMustBeImplemented]() {
     // this is the implementation for this class
   }
 }
 
 let instance = new ClassName;
-instance[InterfaceName.youGetThisMethodForFree]();
+instance[ProtocolName.youGetThisMethodForFree]();
 ```
 
 
@@ -48,7 +48,7 @@ The most well-known protocol in ECMAScript is the iteration protocol. APIs such
 as `Array.from`, the `Map` and `Set` constructors, destructuring syntax, and
 `for-of` syntax are all built around this protocol. But there are many others.
 For example, the protocol defined by `Symbol.toStringTag` could have been
-expressed using interfaces as
+expressed using protocols as
 
 ```js
 protocol ToString {
@@ -60,16 +60,16 @@ protocol ToString {
 }
 
 Object.prototype[ToString.tag] = 'Object';
-Reflect.implement(Object, ToString);
+Protocol.implement(Object, ToString);
 ```
 
 The auto-flattening behaviour of `Promise.prototype.then` was a very controversial decision.
 Valid arguments exist for both the auto-flattening and the monadic versions to be the default.
-Interfaces eliminate this issue in two ways:
+Protocols eliminate this issue in two ways:
 
 1. Symbols are unique and unambiguous. There is no fear of naming collisions,
    and it is clear what function you are using.
-1. Interfaces may be applied to existing classes, so there is nothing
+1. Protocols may be applied to existing classes, so there is nothing
    preventing consumers with different goals from using their own methods.
 
 ```js
@@ -88,14 +88,14 @@ Promise.prototype[Monad.bind] = function (f) {
     return new Identity(f.apply(this, args));
   }).unwrap();
 }
-Reflect.implement(Promise, Monad);
+Protocol.implement(Promise, Monad);
 ```
 
-Finally, one of the biggest benefits of interfaces is that they eliminate the
+Finally, one of the biggest benefits of protocols is that they eliminate the
 fear of mutating built-in prototypes. One of the beautiful aspects of
 ECMAScript is its ability to extend its built-in prototypes. But with the
 limited string namespace, this is untenable in large codebases and impossible
-when integrating with third parties. Because interfaces are based on symbols,
+when integrating with third parties. Because protocols are based on symbols,
 this is no longer an anti-pattern.
 
 ```js
@@ -114,28 +114,16 @@ protocol Ordered {
 }
 
 String.prototype[Ordered.compare] = function() { /* elided */ };
-Reflect.implement(String, Ordered);
+Protocol.implement(String, Ordered);
 ```
-
-
-## Why not use the `interface` keyword?
-
-The initial version of this proposal used the `interface` keyword in place of
-the `protocol` contextual keyword that is used currently. This decision was
-made to avoid ecosystem breakage caused by conflicting with TypeScript's usage
-of the `interface` keyword.
-
-This incompatibility and its effects on the growth of the language are a
-serious concern, and should be addressed by the committee. But for now we will
-be pragmatic and work around the issue. See https://twitter.com/jspedant/status/871875746041446400.
 
 
 ## Features
 
-### interface inheritance
+### protocol inheritance
 
-Interfaces may extend other interfaces. This expresses a dependency
-relationship between the interfaces.
+Protocols may extend other protocols. This expresses a dependency
+relationship between the protocols.
 
 ```js
 protocol A { a; }
@@ -155,9 +143,9 @@ In the example above, notice how B extends A and any class that implements B
 must also implement A.
 
 
-### interfaces throw when not fully implemented
+### protocols throw when not fully implemented
 
-If a class that is implementing an interface is missing some of the required
+If a class that is implementing a protocol is missing some of the required
 fields, it will fail at class definition time. This program will throw:
 
 ```js
@@ -171,7 +159,7 @@ class C implements I {
 
 ### minimal implementations
 
-Minimal implementations can be expressed using interface inheritance.
+Minimal implementations can be expressed using protocol inheritance.
 
 ```js
 // Applicative elided
@@ -197,10 +185,10 @@ class D implements MonadViaJoin {
 }
 ```
 
-### `Reflect.implement`
+### `Protocol.implement`
 
 An important aspect of this proposal is that it needs to be possible to apply
-an interface to an existing class.
+a protocol to an existing class.
 
 ```js
 protocol Functor {
@@ -208,26 +196,26 @@ protocol Functor {
 }
 
 Array.prototype[Functor.map] = Array.prototype.map;
-Reflect.implement(Array, Functor);
+Protocol.implement(Array, Functor);
 ```
 
-`Reflect.implement` accepts zero or more interfaces following the class.
+`Protocol.implement` accepts zero or more protocols following the class.
 
 ```js
 protocol I {}
 protocol K {}
 
 // these are all the same
-let c = Reflect.implement(Reflect.implement(class C {}, I), K);
-let c = Reflect.implement(class C {}, I, K);
+let c = Protocol.implement(Protocol.implement(class C {}, I), K);
+let c = Protocol.implement(class C {}, I, K);
 class C implements I implements K {}
 ```
 
 ### `implements` operator
 
 The `implements` operator returns `true` if and only if a given class provides
-the fields required to implement a given interface as well as the methods
-obtained from implementing the interface.
+the fields required to implement a given protocol as well as the methods
+obtained from implementing the protocol.
 
 ```js
 protocol I { a; b() {} }
@@ -255,7 +243,7 @@ E implements K; // false
 
 ### static fields and methods
 
-Some interfaces require their methods to be put on the constructor instead of
+Some protocols require their methods to be put on the constructor instead of
 the prototype. Use the `static` modifier for this.
 
 ```js
@@ -267,7 +255,7 @@ class C implements A { }
 C[A.b]();
 ```
 
-Similarly, require an interface field to be on the constructor instead of the
+Similarly, require a protocol field to be on the constructor instead of the
 prototype using the `static` modifier.
 
 ```js
@@ -280,7 +268,7 @@ protocol Monoid {
 ### combined export form
 
 To mirror the existing combined declaration/export forms like `export class C {}`,
-`export function f() {}`, etc., interfaces can be simultaneously declared and
+`export function f() {}`, etc., protocols can be simultaneously declared and
 exported using a similar combined form.
 
 ```js
@@ -298,8 +286,8 @@ specific details about the proposal.
 
 ## Open questions or issues
 
-1. Should interfaces be immutable prototype exotic objects? Frozen?
-1. Do we want to have interfaces inherit from some `Interface.prototype` object so they can be abstracted over?
+1. Should protocols be immutable prototype exotic objects? Frozen?
+1. Do we want to have protocols inherit from some `Protocol.prototype` object so they can be abstracted over?
 1. Is there a way we can make `super` properties and `super` calls work?
 
 
@@ -322,11 +310,11 @@ function fmap(fn) {
 
 Similar to how each type in Haskell may only have a single implementation of
 each type class (newtypes are used as a workaround), each class in JavaScript
-may only have a single implementation of each interface.
+may only have a single implementation of each protocol.
 
 Haskell type classes exist only at the type level and not the term level, so they
 cannot be passed around as first class values, and any abstraction over them must
-be done through type-level programming mechanisms. The interfaces in this proposal
+be done through type-level programming mechanisms. The protocols in this proposal
 are themselves values which may be passed around as first class citizens.
 
 ### Rust traits
@@ -354,7 +342,7 @@ class A extends mixin(SuperClass, FeatureA, FeatureB) {}
 
 This mixin pattern usually ends up creating one or more intermediate prototype
 objects which sit between the class and its superclass on the prototype chain.
-In contrast, this proposal works by copying the inherited interface methods
+In contrast, this proposal works by copying the inherited protocol methods
 into the class or its prototype. This proposal is also built entirely off of
 Symbol-named properties, but doing so using existing mechanisms would be
 tedious and difficult to do properly. For an example of the complexity involved
