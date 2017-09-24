@@ -73,9 +73,8 @@ Protocols eliminate this issue in two ways:
    preventing consumers with different goals from using their own methods.
 
 ```js
-// Applicative elided here
-protocol Monad extends Applicative {
-  bind;
+protocol Functor {
+  map;
 }
 
 class Identity {
@@ -83,12 +82,19 @@ class Identity {
   unwrap() { return this.val; }
 }
 
-Promise.prototype[Monad.bind] = function (f) {
-  this.then(function(...args) {
-    return new Identity(f.apply(this, args));
-  }).unwrap();
+Promise.prototype[Functor.map] = function (f) {
+  return this.then(function(x) {
+    if (x instanceof Identity) {
+      x = x.unwrap();
+    }
+    let result = f.call(this, x);
+    if (result instanceof Promise) {
+      result = new Identity(result);
+    }
+    return result;
+  });
 }
-Protocol.implement(Promise, Monad);
+Protocol.implement(Promise, Functor);
 ```
 
 Finally, one of the biggest benefits of protocols is that they eliminate the
