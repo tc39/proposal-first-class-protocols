@@ -334,11 +334,21 @@ called methods in this proposal.
 
 ### Java interfaces
 
-TODO
+Java interfaces, as of Java 8, have many of the same features as this proposal.
+The biggest difference is that Java interfaces are not ad-hoc, meaning existing
+classes cannot be declared to implement protocols after they've already been
+defined. Additionally, Java interfaces share the member name namespace with
+classes and other interfaces, so they may overlap, shadow, or otherwise be
+incompatible, with no way for a user to disambiguate.
 
 ### Ruby mixins
 
-TODO
+Ruby mixins are similar to this proposal in that they allow adding
+functionality to existing classes, but different in a number of ways. The
+biggest difference is the overlapping/conflicting method names due to
+everything existing in one shared namespace. Another difference that is unique
+to Ruby mixins, though, is that they have no check that the methods they rely
+on are implemented by the implementing class.
 
 ### ECMAScript `mixin(...)` pattern
 
