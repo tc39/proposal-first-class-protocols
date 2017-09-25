@@ -152,7 +152,7 @@ must also implement A.
 ### protocols throw when not fully implemented
 
 If a class that is implementing a protocol is missing some of the required
-fields, it will fail at class definition time. This program will throw:
+symbols, it will fail at class definition time. This program will throw:
 
 ```js
 protocol I { a; b; }
@@ -220,7 +220,7 @@ class C implements I implements K {}
 ### `implements` operator
 
 The `implements` operator returns `true` if and only if a given class provides
-the fields required to implement a given protocol as well as the methods
+the symbols required to implement a given protocol as well as the methods
 obtained from implementing the protocol.
 
 ```js
@@ -247,7 +247,7 @@ E implements I; // true
 E implements K; // false
 ```
 
-### static fields and methods
+### static symbols and methods
 
 Some protocols require their methods to be put on the constructor instead of
 the prototype. Use the `static` modifier for this.
@@ -261,7 +261,7 @@ class C implements A { }
 C[A.b]();
 ```
 
-Similarly, require a protocol field to be on the constructor instead of the
+Similarly, require a protocol symbol to be on the constructor instead of the
 prototype using the `static` modifier.
 
 ```js
