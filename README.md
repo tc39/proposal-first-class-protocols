@@ -292,9 +292,14 @@ specific details about the proposal.
 
 ## Open questions or issues
 
-1. Should protocols be immutable prototype exotic objects? Frozen?
+
+1. Should interfaces inherit from Object.prototype?
+1. Should protocols be immutable prototype exotic objects? Frozen? Sealed?
 1. Do we want to have protocols inherit from some `Protocol.prototype` object so they can be abstracted over?
+1. Should implementing a protocol actually copy symbols to prototype/constructor or use internal slots for resolution?
 1. Is there a way we can make `super` properties and `super` calls work?
+1. How does this have to interact with the global symbol registry?
+1. Should methods be created in realm of implementor or just once in realm of definition?
 
 
 ## Relationship to similar features
