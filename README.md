@@ -321,7 +321,10 @@ function fmap(fn) {
 
 Similar to how each type in Haskell may only have a single implementation of
 each type class (newtypes are used as a workaround), each class in JavaScript
-may only have a single implementation of each protocol.
+may only have a single implementation of each protocol. Haskell programmers
+get around this limitation through the use of newtypes. Users of this proposal
+will extend the protocol they wish to implement with each possible alternative
+and allow the consumer to choose the implementation with the symbol they use.
 
 Haskell type classes exist only at the type level and not the term level, so they
 cannot be passed around as first class values, and any abstraction over them must
