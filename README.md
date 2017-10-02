@@ -213,7 +213,7 @@ protocol K {}
 // these are all the same
 let c = Protocol.implement(Protocol.implement(class C {}, I), K);
 let c = Protocol.implement(class C {}, I, K);
-class C implements I implements K {}
+class C implements I, K {}
 ```
 
 ### `implements` operator
