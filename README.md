@@ -211,8 +211,8 @@ protocol I {}
 protocol K {}
 
 // these are all the same
-let c = Protocol.implement(Protocol.implement(class C {}, I), K);
-let c = Protocol.implement(class C {}, I, K);
+let C = Protocol.implement(Protocol.implement(class C {}, I), K);
+let C = Protocol.implement(class C {}, I, K);
 class C implements I, K {}
 ```
 
