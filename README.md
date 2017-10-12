@@ -271,6 +271,23 @@ protocol Monoid {
 }
 ```
 
+### required strings
+
+In order to allow representation of "legacy" protocols which depend on strings,
+the protocol definition syntax allows for a string literal to be used in place of
+the identifier which declares a required symbol.
+
+```js
+protocol LegacyThenable {
+  'then';
+
+  finally() { ... }
+}
+```
+
+Note that there is no facility for *providing* string-named properties &emdash;
+only requiring them.
+
 ### combined export form
 
 To mirror the existing combined declaration/export forms like `export class C {}`,
