@@ -16,22 +16,22 @@ TC39 meeting.
 ```js
 protocol ProtocolName {
   // declare a symbol which must be implemented
-  thisMustBeImplemented;
+  requiredMethodName;
 
-  // and some methods that you get for free by implementing this protocol
-  youGetThisMethodForFree(...parameters) {
-      methodBody;
+  // and some methods that are provided by implementing this protocol
+  providedMethodName(...parameters) {
+    methodBody;
   }
 }
 
 class ClassName implements ProtocolName {
-  [ProtocolName.thisMustBeImplemented]() {
+  [ProtocolName.requiredMethodName]() {
     // this is the implementation for this class
   }
 }
 
 let instance = new ClassName;
-instance[ProtocolName.youGetThisMethodForFree]();
+instance[ProtocolName.providedMethodName]();
 ```
 
 
@@ -92,7 +92,8 @@ Promise.prototype[Functor.map] = function (f) {
     }
     return result;
   });
-}
+};
+
 Protocol.implement(Promise, Functor);
 ```
 
@@ -218,9 +219,9 @@ class C implements I, K {}
 
 ### `implements` operator
 
-The `implements` operator returns `true` if and only if a given class provides
-the symbols required to implement a given protocol as well as the methods
-obtained from implementing the protocol.
+The `implements` operator returns `true` if and only if a given class has all
+of the symbols required to implement a given protocol as well as the methods
+provided by implementing the protocol.
 
 ```js
 protocol I { a; b() {} }
@@ -246,10 +247,10 @@ E implements I; // true
 E implements K; // false
 ```
 
-### static symbols and methods
+### static methods
 
-Some protocols require their methods to be put on the constructor instead of
-the prototype. Use the `static` modifier for this.
+Some protocols would like to provide methods for the constructor instead of the
+prototype. Use the `static` modifier for this.
 
 ```js
 protocol A {
@@ -292,7 +293,7 @@ specific details about the proposal.
 ## Open questions or issues
 
 
-1. Should interfaces inherit from Object.prototype?
+1. Should protocols inherit from Object.prototype?
 1. Should protocols be immutable prototype exotic objects? Frozen? Sealed?
 1. Do we want to have protocols inherit from some `Protocol.prototype` object so they can be abstracted over?
 1. Should implementing a protocol actually copy symbols to prototype/constructor or use internal slots for resolution?
@@ -339,11 +340,11 @@ proposal would be useful in manually guarding a function in a way that Rust's
 trait bounds do. Default methods in Rust traits are equivalent to what we've
 called methods in this proposal.
 
-### Java interfaces
+### Java 8+ interfaces
 
 Java interfaces, as of Java 8, have many of the same features as this proposal.
 The biggest difference is that Java interfaces are not ad-hoc, meaning existing
-classes cannot be declared to implement protocols after they've already been
+classes cannot be declared to implement interfaces after they've already been
 defined. Additionally, Java interfaces share the member name namespace with
 classes and other interfaces, so they may overlap, shadow, or otherwise be
 incompatible, with no way for a user to disambiguate.
@@ -365,7 +366,7 @@ class A extends mixin(SuperClass, FeatureA, FeatureB) {}
 
 This mixin pattern usually ends up creating one or more intermediate prototype
 objects which sit between the class and its superclass on the prototype chain.
-In contrast, this proposal works by copying the inherited protocol methods
+In contrast, this proposal works by copying the provided protocol methods
 into the class or its prototype. This proposal is also built entirely off of
 Symbol-named properties, but doing so using existing mechanisms would be
 tedious and difficult to do properly. For an example of the complexity involved
