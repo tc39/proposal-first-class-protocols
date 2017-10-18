@@ -1,3 +1,6 @@
+'lang sweet.js';
+import { class, protocol, implements } from 'sweet-interfaces';
+
 protocol Semigroup {
   // :: (this :: a, other :: a) -> a
   append;

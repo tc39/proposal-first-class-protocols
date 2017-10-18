@@ -1,3 +1,6 @@
+'lang sweet.js';
+import { class, protocol, implements } from 'sweet-interfaces';
+
 protocol Functor {
   // :: (this :: f a, fn :: a -> b) -> f b
   map;

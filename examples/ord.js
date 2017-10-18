@@ -1,3 +1,6 @@
+'lang sweet.js';
+import { class, protocol, implements } from 'sweet-interfaces';
+
 class Ordering {}
 Ordering.LT = new Ordering;
 Ordering.EQ = new Ordering;

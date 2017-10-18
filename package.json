@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "proposal-first-class-protocols",
+  "version": "0.0.0",
+  "description": "ECMAScript First-Class Protocols Proposal",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "for f in examples/*; do echo \"Compiling $f\"; sjs \"$f\" >/dev/null || exit $?; done"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelficarra/proposal-first-class-protocols.git"
+  },
+  "homepage": "https://github.com/michaelficarra/proposal-first-class-protocols#readme",
+  "devDependencies": {
+    "@sweet-js/cli": "3.0.13",
+    "sweet-interfaces": "*"
+  }
+}

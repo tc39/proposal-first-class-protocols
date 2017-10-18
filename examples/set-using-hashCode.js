@@ -1,3 +1,6 @@
+'lang sweet.js';
+import { class, protocol, implements } from 'sweet-interfaces';
+
 protocol HasHashCode {
   hashCode;
 }
@@ -5,14 +8,14 @@ protocol HasHashCode {
 class SetUsingHashCode extends Set {
   constructor(iterable) {
     super();
-    this.#map = new Map;
+    this._map = new Map;
     for (let x of iterable) {
       this.add(x);
     }
   }
 
   add(value) {
-    this.#map.set(value[HasHashCode.hashCode](), value);
+    this._map.set(value[HasHashCode.hashCode](), value);
   }
 
   // ... others
