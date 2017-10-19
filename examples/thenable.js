@@ -1,6 +1,3 @@
-'lang sweet.js';
-import { class, protocol, implements } from 'sweet-interfaces';
-
 protocol Thenable {
   "then";
 

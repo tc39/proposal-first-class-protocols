@@ -1,6 +1,3 @@
-'lang sweet.js';
-import { class, protocol, implements } from 'sweet-interfaces';
-
 class Maybe {
   static [Applicative.pure](v) {
     return new Just(v);

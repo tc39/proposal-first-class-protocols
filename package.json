@@ -7,7 +7,7 @@
     "example": "examples"
   },
   "scripts": {
-    "test": "for f in examples/*; do echo \"Compiling $f\"; sjs \"$f\" >/dev/null || exit $?; done"
+    "test": "for f in examples/*; do echo \"Compiling $f\"; mkdir -p build; echo \"'lang sweet.js'; import { class, protocol, implements } from 'sweet-interfaces';\" >build/build.js; cat \"$f\" >>build/build.js; sjs build/build.js >/dev/null || exit $?; done"
   },
   "repository": {
     "type": "git",
