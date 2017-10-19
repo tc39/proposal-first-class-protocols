@@ -25,9 +25,19 @@ class Just extends Maybe implements Monad {
   [Bind.bind](fn) {
     return fn(this.value);
   }
+
+  [Alt.alt](other) {
+    return this;
+  }
+
+  [Semigroup.append](other) {
+    return other instanceof Just
+      ? new Just(this.value[Semigroup.append](other.value))
+      : this;
+  }
 }
 
-class Nothing extends Maybe implements Monad {
+class _Nothing extends Maybe implements Monad {
   [Functor.map](fn) {
     return this;
   }
@@ -39,6 +49,16 @@ class Nothing extends Maybe implements Monad {
   [Bind.bind](fn) {
     return this;
   }
+
+  [Alt.alt](other) {
+    return other;
+  }
+
+  [Semigroup.append](other) {
+    return other;
+  }
 }
 
-Nothing.INSTANCE = new Nothing;
+const Nothing = new _Nothing;
+
+Maybe[Monoid.empty] = Nothing;
