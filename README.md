@@ -56,10 +56,12 @@ protocol ToString {
   toString() {
     return `[object ${this[ToString.tag]}]`;
   }
-}
 
-Object.prototype[ToString.tag] = 'Object';
-Protocol.implement(Object, ToString);
+  // Coherence-guaranteed implementation for existing classes
+  impl Object {
+    tag = 'Object';
+  };
+}
 ```
 
 The auto-flattening behaviour of `Promise.prototype.then` was a very controversial decision.
@@ -72,37 +74,37 @@ Protocols eliminate this issue in two ways:
    preventing consumers with different goals from using their own methods.
 
 ```js
-protocol Functor {
-  map;
-}
-
 class Identity {
   constructor(val) { this.val = val; }
   unwrap() { return this.val; }
 }
 
-Promise.prototype[Functor.map] = function (f) {
-  return this.then(function(x) {
-    if (x instanceof Identity) {
-      x = x.unwrap();
-    }
-    let result = f.call(this, x);
-    if (result instanceof Promise) {
-      result = new Identity(result);
-    }
-    return result;
-  });
-};
+protocol Functor {
+  map;
 
-Protocol.implement(Promise, Functor);
+  impl Promise {
+    map(f) {
+      return this.then((x) => {
+        if (x instanceof Identity) {
+          x = x.unwrap();
+        }
+        let result = f.call(this, x);
+        if (result instanceof Promise) {
+          result = new Identity(result);
+        }
+        return result;
+      });
+    }
+  }
+}
 ```
 
 Finally, one of the biggest benefits of protocols is that they eliminate the
-fear of mutating built-in prototypes. One of the beautiful aspects of
-ECMAScript is its ability to extend its built-in prototypes. But with the
-limited string namespace, this is untenable in large codebases and impossible
-when integrating with third parties. Because protocols are based on symbols,
-this is no longer an anti-pattern.
+fear of mutating built-in prototypes in potentially conflicting ways. One of the
+beautiful aspects of ECMAScript is its ability to extend its built-in
+prototypes. But with the limited string namespace, this is untenable in large
+codebases and impossible when integrating with third parties. Because protocols
+are based on symbols and guarantee coherence, this is no longer an anti-pattern.
 
 ```js
 class Ordering {
@@ -117,10 +119,13 @@ protocol Ordered {
   lessThan(other) {
     return this[Ordered.compare](other) === Ordering.LT;
   }
-}
 
-String.prototype[Ordered.compare] = function() { /* elided */ };
-Protocol.implement(String, Ordered);
+  impl String {
+    compare(other) {
+      return String.localeCompare(other);
+    }
+  }
+}
 ```
 
 
@@ -191,7 +196,7 @@ class D implements MonadViaJoin {
 }
 ```
 
-### `Protocol.implement`
+### `impl`
 
 An important aspect of this proposal is that it needs to be possible to apply
 a protocol to an existing class.
@@ -199,23 +204,25 @@ a protocol to an existing class.
 ```js
 protocol Functor {
   map;
+
+  impl Array {
+    map() { return this.map.apply(this, arguments) }
+  }
 }
-
-Array.prototype[Functor.map] = Array.prototype.map;
-Protocol.implement(Array, Functor);
 ```
 
-`Protocol.implement` accepts zero or more protocols following the class.
+Having `impl` allows extending existing prototypes for one's own
+purposes while preventing multiple conflicting implementations using the same
+protocol symbols. With this format, there's only two ways to implement a
+protocol:
 
-```js
-protocol I {}
-protocol K {}
+1. Using the new `implement` keyword to `class`, which allows new class definitions to use a pre-existing protocol.
+2. Using `impl` to make an existing class comply with the protocol.
 
-// these are all the same
-let C = Protocol.implement(Protocol.implement(class C {}, I), K);
-let C = Protocol.implement(class C {}, I, K);
-class C implements I, K {}
-```
+If you do not own one or the other, you are unable to implement the protocol. It
+is an error to try to define individual protocol properties and methods in class
+definitions without using the `implements` keyword. This guarantees coherence,
+which means a protocol can only be implemented once and only once, globally.
 
 ### `implements` operator
 
@@ -239,12 +246,12 @@ class D implements I {
 D implements I; // true
 D implements K; // false
 
-class E {
+class F implements I, K {
   [I.a]() {}
-  [I.b]() {}
+  [K.a]() {}
 }
-E implements I; // true
-E implements K; // false
+D implements I; // true
+D implements K; // true
 ```
 
 ### static methods
@@ -254,39 +261,41 @@ prototype. Use the `static` modifier for this.
 
 ```js
 protocol A {
-  static b() {}
+  static b;
+  static c() { return 'c'; }
 }
 
-class C implements A { }
-C[A.b]();
+class C implements A {
+  static [A.b] () { return 'b'; }
+}
+C[A.b](); // 'b'
+C[A.c](); // 'c'
 ```
 
-Similarly, require a protocol symbol to be on the constructor instead of the
-prototype using the `static` modifier.
+### Legacy string-based protocols
+
+First-class protocols cannot be used to define legacy string-based behaviors.
+They can only define protocol symbol-based ones. Instead, the protocol must be
+implemented on its symbols, and a regular string-based method added directly
+that makes its own choices about what code will be invoked for the legacy code.
+Coherence cannot be guaranteed for those, so it is not part of the scope of
+protocols.
 
 ```js
-protocol Monoid {
-  concat;
-  static identity;
+protocol Thenable {
+  then () { return this.then.apply(this, arguments) };
+  // Adding new-protocol support directly to a legacy class
+  impl Promise; // Adds default impl from above.
+}
+
+// Alternately, editing our own implementation to add the impl.
+class MyOldDeferred implements Thenable {
+  [Thenable.then]() { return this.then.apply(this, arguments) }
+  then (onResolve, onReject) {
+    ...legacy impl...
+  }
 }
 ```
-
-### required strings
-
-In order to allow representation of "legacy" protocols which depend on strings,
-the protocol definition syntax allows for a string literal to be used in place of
-the identifier which declares a required symbol.
-
-```js
-protocol LegacyThenable {
-  'then';
-
-  finally() { ... }
-}
-```
-
-Note that there is no facility for *providing* string-named properties &emdash;
-only requiring them.
 
 ### combined export form
 
@@ -356,6 +365,12 @@ restriction exists with this proposal. The `implements` operator in this
 proposal would be useful in manually guarding a function in a way that Rust's
 trait bounds do. Default methods in Rust traits are equivalent to what we've
 called methods in this proposal.
+
+The coherence restrictions in this proposal (not allowing implementations
+outside of `class` or `protocol` bodies) are based on Rust's coherence
+restrictions and adapted for JavaScript itself. Unlike Rust's, the restrictions
+in this proposal are more flexible because they allow using multiple overlapping
+methods from separate protocols in the same module, unlike Rust.
 
 ### Java 8+ interfaces
 
