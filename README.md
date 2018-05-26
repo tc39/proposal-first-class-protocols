@@ -27,7 +27,7 @@ class ClassName {
 }
 
 let instance = new ClassName();
-ProtocolName(instance).providedMethodName();
+instance[ProtocolName].providedMethodName();
 ```
 
 ## What is it used for?
@@ -41,7 +41,7 @@ protocol ToString {
   tag;
 
   toString() {
-    return `[object ${ToString(this).tag}]`;
+    return `[object ${this[ToString].tag}]`;
   }
 
   // Coherence-guaranteed implementation for existing classes
@@ -79,7 +79,7 @@ protocol Ordered {
   compare;
 
   lessThan(other) {
-    return Ordered(this).compare(other) === Ordered.LT;
+    return this[Ordered].compare(other) === Ordered.LT;
   }
 
   implFor String {
@@ -93,8 +93,8 @@ protocol Ordered {
   }
 }
 
-(2).compare(1) // Ordered.GT
-'a'.lessThan('aa') // true
+(2)[Ordered].compare(1) // Ordered.GT
+'a'[Ordered].lessThan('aa') // true
 ```
 
 ## Other Features
@@ -233,7 +233,7 @@ protocol Thenable {
 
   implFor Promise {
     // Forward the private Thenable then() method to the existing public
-    then () { return this.then.apply(this, arguments) }
+    then() { return this.then.apply(this, arguments) }
   }
 }
 
@@ -244,6 +244,7 @@ class MyOldDeferred {
   }
   implements Thenable {
     then(onResolve, onReject) {
+      // Call the toplevel, regular method.
       return this.then(onResolve, onReject)
     }
   }
@@ -251,7 +252,7 @@ class MyOldDeferred {
 
 // These both do the same thing.
 new MyOldDeferred().then(console.log)
-Thenable(new MyOldDeferred()).then(console.log)
+new MyOldDeferred()[Thenable].then(console.log)
 ```
 
 ### combined export form
@@ -266,16 +267,32 @@ export protocol I {
 }
 ```
 
+### `super`
+
+The `super` keyword inside a protocol implementation works as it usually would:
+
+```js
+protocol Proto { then; }
+
+class Parent {
+  implements Proto {
+    greet() { return 'hello'; }
+  }
+}
+
+class Child extends Parent {
+  implements Proto {
+    greet() { return super[Proto].greet() + ' world'; }
+  }
+}
+
+```
+
 ## Open questions or issues
 
 1. Should protocols inherit from Object.prototype?
 1. Should protocols be immutable prototype exotic objects? Frozen? Sealed?
-1. Do we want to have protocols inherit from some `Protocol.prototype` object so they can be abstracted over?
-1. Should implementing a protocol actually copy symbols to prototype/constructor or use internal slots for resolution?
-1. Is there a way we can make `super` properties and `super` calls work?
-1. How does this have to interact with the global symbol registry?
 1. Should methods be created in realm of implementor or just once in realm of definition?
-
 
 ## Relationship to similar features
 
