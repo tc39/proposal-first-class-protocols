@@ -1,12 +1,6 @@
 ECMAScript First-Class Protocols Proposal
 =========================================
 
-As of ES2015, new ECMAScript standard library APIs have used a protocol-based
-design, enabled by the introduction of Symbols. Symbols are ECMAScript values
-which have identity and may be used as object property keys. The goal of this
-proposal is to provide a convenient syntactic facility for protocol-based
-design.
-
 The proposal is at **Stage 1** after having been proposed at the
 [September 2017](https://github.com/tc39/agendas/blob/master/2017/09.md)
 TC39 meeting.
@@ -20,139 +14,122 @@ protocol ProtocolName {
 
   // and some methods that are provided by implementing this protocol
   providedMethodName(...parameters) {
-    methodBody;
+    ...method body...
   }
 }
 
-class ClassName implements ProtocolName {
-  [ProtocolName.requiredMethodName]() {
-    // this is the implementation for this class
+class ClassName {
+  implements ProtocolName {
+    requiredMethodName() {
+      console.log('hello yes i am the required one have a nice day');
+    }
   }
 }
 
-let instance = new ClassName;
-instance[ProtocolName.providedMethodName]();
+let instance = new ClassName();
+ProtocolName(instance).providedMethodName();
 ```
-
-
-## How can I play with it?
-
-A prototype using [sweet.js](https://www.sweetjs.org/) is available at
-https://github.com/disnet/sweet-interfaces
-
 
 ## What is it used for?
 
 The most well-known protocol in ECMAScript is the iteration protocol. APIs such
 as `Array.from`, the `Map` and `Set` constructors, destructuring syntax, and
 `for-of` syntax are all built around this protocol. But there are many others.
-For example, the protocol defined by `Symbol.toStringTag` could have been
-expressed using protocols as
 
 ```js
 protocol ToString {
   tag;
 
   toString() {
-    return `[object ${this[ToString.tag]}]`;
+    return `[object ${ToString(this).tag}]`;
   }
 
   // Coherence-guaranteed implementation for existing classes
-  impl Object {
+  implFor Object {
     tag = 'Object';
   };
 }
 ```
 
-The auto-flattening behaviour of `Promise.prototype.then` was a very controversial decision.
-Valid arguments exist for both the auto-flattening and the monadic versions to be the default.
-Protocols eliminate this issue in two ways:
+Protocols isolate implementations meant for different purposes by keeping them
+in a separate object with certain static guarantees.
 
-1. Symbols are unique and unambiguous. There is no fear of naming collisions,
-   and it is clear what function you are using.
-1. Protocols may be applied to existing classes, so there is nothing
-   preventing consumers with different goals from using their own methods.
-
-```js
-class Identity {
-  constructor(val) { this.val = val; }
-  unwrap() { return this.val; }
-}
-
-protocol Functor {
-  map;
-
-  impl Promise {
-    map(f) {
-      return this.then((x) => {
-        if (x instanceof Identity) {
-          x = x.unwrap();
-        }
-        let result = f.call(this, x);
-        if (result instanceof Promise) {
-          result = new Identity(result);
-        }
-        return result;
-      });
-    }
-  }
-}
-```
-
-Finally, one of the biggest benefits of protocols is that they eliminate the
+One of the biggest benefits of protocols is that they eliminate the
 fear of mutating built-in prototypes in potentially conflicting ways. One of the
 beautiful aspects of ECMAScript is its ability to extend its built-in
 prototypes. But with the limited string namespace, this is untenable in large
 codebases and impossible when integrating with third parties. Because protocols
-are based on symbols and guarantee coherence, this is no longer an anti-pattern.
+are based on symbols and support coherence, this is no longer an anti-pattern.
 
 ```js
 class Ordering {
-  static LT = new Ordering;
-  static EQ = new Ordering;
-  static GT = new Ordering;
+  constructor (str) { this.symbol = Symbol(str) }
 }
 
 protocol Ordered {
+  static LT = new Ordering('LT');
+  static EQ = new Ordering('EQ');
+  static GT = new Ordering('GT');
+  static fromNum (num) {
+      if (num < 0) return Ordered.LT;
+      if (num === 0) return Ordered.EQ;
+      if (num > 0) return Ordered.GT;
+    }
+  }
   compare;
 
   lessThan(other) {
-    return this[Ordered.compare](other) === Ordering.LT;
+    return Ordered(this).compare(other) === Ordered.LT;
   }
 
-  impl String {
+  implFor String {
     compare(other) {
-      return String.localeCompare(other);
+      return Ordered.fromNum(String.localeCompare(other));
     }
   }
+
+  implFor Number {
+    compare(other) {...}
+  }
 }
+
+(2).compare(1) // Ordered.GT
+'a'.lessThan('aa') // true
 ```
 
-
-## Features
+## Other Features
 
 ### protocol inheritance
 
-Protocols may extend other protocols. This expresses a dependency
-relationship between the protocols.
+Protocols may extend other protocols. This expresses a dependency relationship
+between the protocols.
 
 ```js
-protocol A { a; }
-protocol B extends A { b; }
+protocol Iterator { next; }
+protocol PeekableIterator extends Iterator { prev; }
 
-class C implements B {
-  [A.a]() {}
-  [B.b]() {}
+class BackAndForth {
+  constructor (values) {
+    this.values = [...values]
+    this.idx = 0
+  }
+  // Iterator MUST be implemented if PeekableIterator is being defined.
+  // If a superclass implemented Iterator already, though, that counts.
+  implements Iterator {
+    next() { ... }
+  }
+  implements PeekableIterator {
+    prev() { ... }
+  }
 }
 
-class D implements A {
-  [A.a]() {}
+// This throws an ProtocolDependencyError, because Iterator must be implemented
+class OnlyPeeks {
+  implements PeekableIterator {
+    prev() { ... }
+  }
 }
 ```
-
-In the example above, notice how B extends A and any class that implements B
-must also implement A.
-
 
 ### protocols throw when not fully implemented
 
@@ -162,41 +139,16 @@ symbols, it will fail at class definition time. This program will throw:
 ```js
 protocol I { a; b; }
 
-class C implements I {
-  [I.a]() {}
-  // note the missing implementation of I.b
+class C {
+  implements I {
+    a() {}
+    // b() {}
+    // ^__ throws PartialImplError
+  }
 }
 ```
 
-### minimal implementations
-
-Minimal implementations can be expressed using protocol inheritance.
-
-```js
-// Applicative elided
-protocol Monad extends Applicative {
-  bind;
-  join;
-  kleisli() {}
-}
-
-// two possible minimal implementations for Monad
-protocol MonadViaBind extends Monad {
-  [Monad.join]() { /* default implementation in terms of bind elided */ }
-}
-protocol MonadViaJoin extends Monad {
-  [Monad.bind]() { /* default implementation in terms of join elided */ }
-}
-
-class C implements MonadViaBind {
-  [Monad.bind]() {}
-}
-class D implements MonadViaJoin {
-  [Monad.join]() {}
-}
-```
-
-### `impl`
+### `implFor <class>`
 
 An important aspect of this proposal is that it needs to be possible to apply
 a protocol to an existing class.
@@ -205,50 +157,50 @@ a protocol to an existing class.
 protocol Functor {
   map;
 
-  impl Array {
+  implFor Array {
     map() { return this.map.apply(this, arguments) }
   }
 }
 ```
 
-Having `impl` allows extending existing prototypes for one's own
-purposes while preventing multiple conflicting implementations using the same
-protocol symbols. With this format, there's only two ways to implement a
-protocol:
+Having `implFor` allows extending existing prototypes for one's own purposes
+while preventing multiple conflicting implementations using the same protocol
+symbols. With this format, there's only two ways to implement a protocol:
 
-1. Using the new `implement` keyword to `class`, which allows new class definitions to use a pre-existing protocol.
-2. Using `impl` to make an existing class comply with the protocol.
+1. Using the new `implements` keyword in `class` bodies, which allows new class definitions to use a pre-existing protocol.
+2. Using `implFor` to make an existing class comply with the protocol.
 
 If you do not own one or the other, you are unable to implement the protocol. It
-is an error to try to define individual protocol properties and methods in class
+is impossible to define individual protocol properties and methods in class
 definitions without using the `implements` keyword. This guarantees coherence,
 which means a protocol can only be implemented once and only once, globally.
 
 ### `implements` operator
 
-The `implements` operator returns `true` if and only if a given class has all
-of the symbols required to implement a given protocol as well as the methods
-provided by implementing the protocol.
+The `implements` operator returns `true` iff a given class has implemented a
+protocol, or if a protocol has provided an `implFor` for an existing class.
+There is no way to define individual protocol methods on a class without using
+one of these two methods.
 
 ```js
 protocol I { a; b() {} }
 protocol K { a; b() {} }
 
-class C {
-  [I.a]() {}
-}
-C implements I; // false
-C implements K; // false
-
-class D implements I {
-  [I.a]() {}
+class D {
+  implements I {
+    a() {}
+  }
 }
 D implements I; // true
 D implements K; // false
 
-class F implements I, K {
-  [I.a]() {}
-  [K.a]() {}
+class F {
+  implements I {
+    a() {}
+  }
+  implements K {
+    a() {}
+  }
 }
 D implements I; // true
 D implements K; // true
@@ -256,45 +208,50 @@ D implements K; // true
 
 ### static methods
 
-Some protocols would like to provide methods for the constructor instead of the
-prototype. Use the `static` modifier for this.
+Static protocol methods are added to the protocol object itself, not to classes
+that implement it:
 
 ```js
 protocol A {
-  static b;
+  static b = 'b'
   static c() { return 'c'; }
 }
 
-class C implements A {
-  static [A.b] () { return 'b'; }
-}
-C[A.b](); // 'b'
-C[A.c](); // 'c'
+A.b() // 'b'
+A.c() // 'c'
 ```
 
 ### Legacy string-based protocols
 
-First-class protocols cannot be used to define legacy string-based behaviors.
-They can only define protocol symbol-based ones. Instead, the protocol must be
-implemented on its symbols, and a regular string-based method added directly
-that makes its own choices about what code will be invoked for the legacy code.
-Coherence cannot be guaranteed for those, so it is not part of the scope of
-protocols.
+There is no way to implement or enforce classic property-based protocols using
+this language feature. At best, one can implement public interfaces into one
+specific protocol implementation:
 
 ```js
 protocol Thenable {
-  then () { return this.then.apply(this, arguments) };
-  // Adding new-protocol support directly to a legacy class
-  impl Promise; // Adds default impl from above.
+  then;
+
+  implFor Promise {
+    // Forward the private Thenable then() method to the existing public
+    then () { return this.then.apply(this, arguments) }
+  }
 }
 
 // Alternately, editing our own implementation to add the impl.
-class MyOldDeferred implements Thenable {
-  [Thenable.then]() { return this.then.apply(this, arguments) }
-  then (onResolve, onReject) {
+class MyOldDeferred {
+  then(onResolve, onReject) {
     ...legacy impl...
   }
+  implements Thenable {
+    then(onResolve, onReject) {
+      return this.then(onResolve, onReject)
+    }
+  }
 }
+
+// These both do the same thing.
+new MyOldDeferred().then(console.log)
+Thenable(new MyOldDeferred()).then(console.log)
 ```
 
 ### combined export form
@@ -309,15 +266,7 @@ export protocol I {
 }
 ```
 
-
-## Details
-
-See the tests in https://github.com/disnet/sweet-interfaces/tree/master/test for
-specific details about the proposal.
-
-
 ## Open questions or issues
-
 
 1. Should protocols inherit from Object.prototype?
 1. Should protocols be immutable prototype exotic objects? Frozen? Sealed?
