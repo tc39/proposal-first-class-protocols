@@ -13,7 +13,7 @@ TC39 meeting.
 
 ## What does it look like?
 
-The most up-to-date information about this proposal can be found in [the July 2018 presentation to the committee](https://docs.google.com/presentation/d/1HnxJl4Iodf3I23e-ZDkw4F1LEkMRGUBFq6xxR0a9a_k/edit#slide=id.g3e3a1a53c0_0_0).
+The most up-to-date information about this proposal can be found in [the July 2018 presentation to the committee](/July%202018%20Update_%20ECMAScript%20Proposal_%20First-Class%20Protocols.pdf).
 
 
 ## How can I play with it?
