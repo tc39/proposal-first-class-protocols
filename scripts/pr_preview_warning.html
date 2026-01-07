@@ -1,0 +1,69 @@
+<style>
+  details.annoying-warning {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    border: 2px solid white;
+    background-color: #920800;
+    background-image: linear-gradient(transparent 40%, rgba(255, 255, 255, 0.2));
+    color: white;
+    opacity: .95;
+  }
+
+  details.annoying-warning[open] {
+    top: 40%;
+    translate: 0 calc(-1 * min(50%, 40vh));
+    left: 5%;
+    right: 5%;
+    margin: 0 auto;
+    max-width: 800px;
+    outline: solid 10000px rgba(255, 255, 255, 0.6);
+    border-radius: 3px;
+    border-width: 1px;
+    box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
+  }
+
+  details.annoying-warning > summary {
+    padding: 0.5ex 1ex;
+    font-size: 0.875em;
+    font-weight: bold;
+    letter-spacing: 0.02em;
+    text-align: center;
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.85);
+    cursor: default;
+  }
+
+  details.annoying-warning > p {
+    line-height: 1.4;
+    margin: 1em;
+    text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.85);
+  }
+
+  details.annoying-warning a {
+    color: inherit;
+    text-decoration: underline;
+  }
+</style>
+
+<details class="annoying-warning">
+  <summary>{{SUMMARY}}</summary>
+  <p>
+    This document is a preview of merging {{PR_LINK}} as {{COMMIT_LINK}}.
+  </p>
+  <p>
+    Do not reference it as authoritative in any way.
+    Instead, see the living specification at {{REPO_LINK}}.
+  </p>
+</details>
+<script>
+  {
+    const dismissWarnings = evt => {
+      if (evt.code !== 'Escape') return;
+      for (const el of document.querySelectorAll('details.annoying-warning[open]')) {
+        el.open = false;
+      }
+    };
+    document.addEventListener('keydown', dismissWarnings, { passive: true });
+  }
+</script>

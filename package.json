@@ -7,15 +7,27 @@
     "example": "examples"
   },
   "scripts": {
-    "test": "for f in examples/*; do echo \"Compiling $f\"; mkdir -p build; echo \"'lang sweet.js'; import { class, protocol, implements } from 'sweet-interfaces';\" >build/build.js; cat \"$f\" >>build/build.js; sjs build/build.js >/dev/null || exit $?; done"
+    "test": "for f in examples/*; do echo \"Compiling $f\"; mkdir -p build; echo \"'lang sweet.js'; import { class, protocol, implements } from 'sweet-interfaces';\" >build/build.js; cat \"$f\" >>build/build.js; sjs build/build.js >/dev/null || exit $?; done",
+    "start": "npm run build-loose -- --watch",
+    "build": "npm run build-loose -- --strict",
+    "build-loose": "node -e 'fs.mkdirSync(\"build\", { recursive: true })' && ecmarkup --load-biblio @tc39/ecma262-biblio --verbose spec.emu build/index.html --lint-spec"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/michaelficarra/proposal-first-class-protocols.git"
+    "url": "git+https://github.com/tc39/proposal-first-class-protocols.git"
   },
-  "homepage": "https://github.com/michaelficarra/proposal-first-class-protocols#readme",
+  "license": "MIT",
+  "homepage": "https://github.com/tc39/proposal-first-class-protocols#readme",
   "devDependencies": {
     "@sweet-js/cli": "3.0.13",
-    "sweet-interfaces": "*"
+    "sweet-interfaces": "*",
+    "@tc39/ecma262-biblio": "^2.1.2895",
+    "ecmarkup": "^21.3.0",
+    "jsdom": "^26.1.0",
+    "parse5-html-rewriting-stream": "^7.1.0",
+    "tmp": "^0.2.3"
+  },
+  "engines": {
+    "node": ">= 18"
   }
 }
