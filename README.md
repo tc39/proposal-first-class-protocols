@@ -7,13 +7,214 @@ which have identity and may be used as object property keys. The goal of this
 proposal is to provide a convenient syntactic facility for protocol-based
 design.
 
-The proposal is at **Stage 1** after having been proposed at the
-[September 2017](https://github.com/tc39/agendas/blob/master/2017/09.md)
-TC39 meeting.
+Stage: **1**
+
+Champions:
+- Michael Ficarra (@michaelficarra)
+- Lea Verou (@leaverou)
 
 ## What does it look like?
 
-The most up-to-date information about this proposal can be found in [the July 2018 presentation to the committee](/July%202018%20Update_%20ECMAScript%20Proposal_%20First-Class%20Protocols.pdf).
+### Basic syntax
+
+The syntax for declaring a protocol looks like this:
+
+```js
+protocol Foldable {
+  // required members
+  foldr;
+
+  // provided members
+  toArray() {
+    return this[Foldable.foldr]((m, a) => [a].concat(m), []);
+  }
+  get length() {
+    return this[Foldable.foldr](m => m + 1, 0);
+  }
+}
+```
+
+Field-like declarations define **required members** whereas methods and accessors define **provided members**.
+Despite the syntactic similarity to class elements, the names of protocol members are actually symbols, which ensures uniqueness and prevents name collisions.
+E.g. in this example, the required member is not a `"foldr"` property, but a `Foldable.foldr` symbol,
+and the two methods provided will not be added to classes as `"toArray"` or `"length"` properties, but as `Foldable.toArray` and `Foldable.length` symbols.
+
+Once a protocol is declared, it can be _implemented_ on any class that satisfies the protocol's requirements (currently only property presence).
+
+> [!IMPORTANT]
+> Currently the only constraint is around property presence. See issue [#4](https://github.com/tc39/proposal-first-class-protocols/issues/4) for discussion on additional constraint types.
+
+One possible syntax is via the `implements` keyword:
+```js
+class C implements Foldable {
+  [Foldable.foldr](f, memo) {
+    // implementation elided
+  }
+}
+```
+
+By implementing `Foldable`, class `C` now gained a `C.prototype[Foldable.toArray]` method and a `C.prototype[Foldable.length]` accessor, which it can choose to expose to the outside world like so:
+
+```js
+class C implements Foldable {
+  [Foldable.foldr](f, memo) {
+    // implementation elided
+  }
+
+  get toArray() {
+    return this[Foldable.toArray];
+  }
+
+  get length() {
+    return this[Foldable.length];
+  }
+}
+```
+
+### Sugar for defining required members
+
+Conveniences can be provided for implementing protocols without repeating members names through a new ClassElement for declaring protocol implementation:
+
+```js
+class NEList {
+  constructor(head, tail) {
+    this.head = head;
+    this.tail = tail;
+  }
+
+  implements protocol Foldable {
+    // Sugar for defining [Foldable.foldr]
+    foldr (f, memo) {
+      // implementation elided
+    }
+  }
+}
+```
+
+> [!IMPORTANT]
+> Is this useful? Should it be generalized beyond protocols? See [#56](https://github.com/tc39/proposal-first-class-protocols/issues/56).
+
+### Inline implementations for existing classes
+
+While typically classes are protocol consumers, protocols can also define implementations for existing classes, including built-in classes:
+
+```js
+protocol Foldable {
+  // ...
+
+  implemented by Array {
+    foldr (f, memo) {
+      // implementation elided
+    }
+  }
+}
+```
+
+> [!IMPORTANT]
+> Is this MVP, given `Protocol.implement()` can also do this? See issue [#63](https://github.com/tc39/proposal-first-class-protocols/issues/63).
+
+### Dynamic implementation
+
+Protocol implementation can also be entirely decoupled from both protocol and class definition, via the `Protocol.implement()` function:
+
+```js
+protocol Functor { map; }
+
+class NEList {
+  constructor(head, tail) {
+    this.head = head;
+    this.tail = tail;
+  }
+}
+
+NEList.prototype[Functor.map] = function (f) {
+  // implementation elided
+};
+
+Protocol.implement(NEList, Functor);
+```
+
+### Protocol composition
+
+Like classes, protocols can use inheritance to compose progressively more complex protocols from simpler ones:
+
+```js
+protocol A { a; }
+protocol B extends A { b; }
+
+class C {
+  implements protocol B {
+    a() {}
+    b() {}
+  }
+}
+
+// or
+
+class C {
+  implements protocol A {
+    a() {}
+  }
+  implements protocol B {
+    b() {}
+  }
+}
+```
+
+### Imperative protocol construction
+
+Protocols can also be constructed imperatively, via the `Protocol()` constructor.
+All options are optional.
+
+```js
+const Foldable = new Protocol({
+  name: 'Foldable',
+  extends: [ ... ],
+  requires: {
+    foldr: Symbol('Foldable.foldr'),
+  },
+  staticRequires: { ... },
+  provides:
+    Object.getOwnPropertyDescriptors({
+      toArray() { ... },
+      get length() { ... },
+      contains(eq, e) { ... },
+    }),
+  staticProvides: // ...,
+});
+```
+
+### Querying protocol membership
+
+An `implements` operator can be used to query protocol membership, by checking whether a class satisfies a protocol's requirements and includes its provided members.
+
+```js
+if (C implements P) {
+  // reached iff C has all fields
+  // required by P and all fields
+  // provided by P
+}
+```
+
+### String required fields
+
+Committee feedback was that string-based fields are required for FCPs to be able to describe protocols already in the language, such as thenables.
+This is possible by quoting the required member name in the protocol declaration:
+
+```js
+protocol P {
+  "a";
+  b(){ print('b'); }
+}
+
+class C {
+  a() {}
+  implements protocol P {}
+}
+
+C implements P; // true
+(new C)[P.b](); // prints 'b'
+```
 
 
 ## How can I play with it?
@@ -183,3 +384,8 @@ in doing it properly, see the output of the sweet.js implementation.
 * [[ES Wiki] strawman:syntax_for_efficient_traits](https://web.archive.org/web/20160616221253/http://wiki.ecmascript.org/doku.php?id=strawman:syntax_for_efficient_traits)
 * [[ES Wiki] strawman:classes_with_trait_composition](https://web.archive.org/web/20160318073016/http://wiki.ecmascript.org/doku.php?id=strawman:classes_with_trait_composition)
 * [[es-discuss] Traits - current state of discussion](https://esdiscuss.org/topic/traits-current-state-of-discussion)
+
+## History
+
+* [July 2018 presentation to the committee](/July%202018%20Update_%20ECMAScript%20Proposal_%20First-Class%20Protocols.pdf)
+* [Initial proposal at the September 2017 TC39 meeting](https://github.com/tc39/agendas/blob/master/2017/09.md)
