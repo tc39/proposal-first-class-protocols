@@ -1,5 +1,5 @@
 protocol Thenable {
-  "then";
+  requires "then";
 
   get [Promise.then]() { return this.then; }
 

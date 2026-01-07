@@ -1,5 +1,5 @@
 protocol HasHashCode {
-  hashCode;
+  requires hashCode;
 }
 
 class SetUsingHashCode extends Set {
