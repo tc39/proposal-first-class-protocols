@@ -35,7 +35,7 @@ protocol Foldable {
 ```
 
 Field-like declarations define **required members** whereas methods and accessors define **provided members**.
-Despite the similarity to strings, protocol members are actually symbols, which ensures uniqueness and prevents name collisions.
+Despite the syntactic similarity to class elements, the names of protocol members are actually symbols, which ensures uniqueness and prevents name collisions.
 E.g. in this example, the required member is not a `"foldr"` property, but a `Foldable.foldr` symbol,
 and the two methods provided will not be added to classes as `"toArray"` or `"length"` properties, but as `Foldable.toArray` and `Foldable.length` symbols.
 
