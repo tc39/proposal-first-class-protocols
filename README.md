@@ -92,7 +92,7 @@ class NEList {
 
 ### Inline implementations for existing classes
 
-While typically classes are protocol consumers, protocols can also define implementations for existing classes, such as built-in classes:
+While typically classes are protocol consumers, protocols can also define implementations for existing classes, including built-in classes:
 
 ```js
 protocol Foldable {
