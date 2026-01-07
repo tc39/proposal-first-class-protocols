@@ -1,5 +1,5 @@
 protocol Foldable {
-  foldr;
+  requires foldr;
 
   get length() {
     return this[Foldable.foldr](memo => memo + 1, 0);

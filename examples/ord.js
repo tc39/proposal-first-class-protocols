@@ -5,7 +5,7 @@ Ordering.GT = new Ordering;
 
 protocol Ordered {
   // :: (this :: a, other :: a) -> Ordering
-  compare;
+  requires compare;
 
   // :: (this :: a, other :: a) -> Boolean
   lessThan(other) {

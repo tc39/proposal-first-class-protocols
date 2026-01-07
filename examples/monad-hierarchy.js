@@ -1,6 +1,6 @@
 protocol Functor {
   // :: (this :: f a, fn :: a -> b) -> f b
-  map;
+  requires map;
 
   // :: (this :: f a) -> f Unit
   void() {
@@ -10,7 +10,7 @@ protocol Functor {
 
 protocol Apply extends Functor {
   // :: (this :: f a, fn :: f (a -> b)) -> f b
-  apply;
+  requires apply;
 
   // :: (this :: f a, fn :: (this :: a -> other :: b -> c), other :: f b) -> f c
   lift2(fn, other) {
@@ -20,11 +20,11 @@ protocol Apply extends Functor {
 
 protocol Applicative extends Apply {
   // :: (this :: f, v :: a) -> f a
-  static pure;
+  requires static pure;
 }
 
 protocol Bind extends Apply {
-  bind;
+  requires bind;
 
   join() {
     return this[Bind.bind](x => x);

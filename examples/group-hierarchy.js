@@ -1,11 +1,11 @@
 protocol Semigroup {
   // :: (this :: a, other :: a) -> a
-  append;
+  requires append;
 }
 
 protocol Monoid extends Semigroup {
   // :: a
-  static unit;
+  requires static unit;
 }
 
 Array.prototype[Semigroup.append] = Array.prototype.concat;

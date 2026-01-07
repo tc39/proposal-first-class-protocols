@@ -21,8 +21,7 @@ The syntax for declaring a protocol looks like this:
 
 ```js
 protocol Foldable {
-  // required members
-  foldr;
+  requires foldr;
 
   // provided members
   toArray() {
@@ -34,12 +33,17 @@ protocol Foldable {
 }
 ```
 
-Field-like declarations define **required members** whereas methods and accessors define **provided members**.
-Despite the syntactic similarity to class elements, the names of protocol members are actually symbols, which ensures uniqueness and prevents name collisions.
+> [!IMPORTANT]
+> An alternative to the `requires` keyword is `abstract`. See issue [#50](https://github.com/tc39/proposal-first-class-protocols/issues/50).
+
+Required members are defined by the `requires` keyword.
+Any other member is _provided_.
+
+Despite the syntactic similarity to class elements, the names of protocol members are actually **symbols**, which ensures uniqueness and prevents name collisions.
 E.g. in this example, the required member is not a `"foldr"` property, but a `Foldable.foldr` symbol,
 and the two methods provided will not be added to classes as `"toArray"` or `"length"` properties, but as `Foldable.toArray` and `Foldable.length` symbols.
 
-Once a protocol is declared, it can be _implemented_ on any class that satisfies the protocol's requirements (currently only property presence).
+Once a protocol is declared, it can be _implemented_ on any class that satisfies the protocol's requirements.
 
 > [!IMPORTANT]
 > Currently the only constraint is around property presence. See issue [#4](https://github.com/tc39/proposal-first-class-protocols/issues/4) for discussion on additional constraint types.
@@ -73,7 +77,7 @@ class C implements Foldable {
 
 ### Sugar for defining required members
 
-Conveniences can be provided for implementing protocols without repeating members names through a new ClassElement for declaring protocol implementation:
+Conveniences can be provided for implementing protocols without repeating protocol names through a new ClassElement for declaring protocol implementation:
 
 ```js
 class NEList {
@@ -139,8 +143,8 @@ Protocol.implement(NEList, Functor);
 Like classes, protocols can use inheritance to compose progressively more complex protocols from simpler ones:
 
 ```js
-protocol A { a; }
-protocol B extends A { b; }
+protocol A { requires a; }
+protocol B extends A { requires b; }
 
 class C {
   implements protocol B {
@@ -203,13 +207,12 @@ This is possible by quoting the required member name in the protocol declaration
 
 ```js
 protocol P {
-  "a";
+  requires "a";
   b(){ print('b'); }
 }
 
-class C {
+class C implements P {
   a() {}
-  implements protocol P {}
 }
 
 C implements P; // true
@@ -235,7 +238,7 @@ expressed using protocols as
 
 ```js
 protocol ToString {
-  tag;
+  requires tag;
 
   toString() {
     return `[object ${this[ToString.tag]}]`;
@@ -257,7 +260,7 @@ Protocols eliminate this issue in two ways:
 
 ```js
 protocol Functor {
-  map;
+  requires map;
 }
 
 class Identity {
@@ -296,7 +299,7 @@ class Ordering {
 }
 
 protocol Ordered {
-  compare;
+  requires compare;
 
   lessThan(other) {
     return this[Ordered.compare](other) === Ordering.LT;
