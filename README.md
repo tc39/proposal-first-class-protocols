@@ -43,7 +43,7 @@ Despite the syntactic similarity to class elements, the names of protocol member
 E.g. in this example, the required member is not a `"foldr"` property, but a `Foldable.foldr` symbol,
 and the two methods provided will not be added to classes as `"toArray"` or `"length"` properties, but as `Foldable.toArray` and `Foldable.length` symbols.
 
-Once a protocol is declared, it can be _implemented_ on any class that satisfies the protocol's requirements (currently only property presence).
+Once a protocol is declared, it can be _implemented_ on any class that satisfies the protocol's requirements.
 
 > [!IMPORTANT]
 > Currently the only constraint is around property presence. See issue [#4](https://github.com/tc39/proposal-first-class-protocols/issues/4) for discussion on additional constraint types.
@@ -77,7 +77,7 @@ class C implements Foldable {
 
 ### Sugar for defining required members
 
-Conveniences can be provided for implementing protocols without repeating members names through a new ClassElement for declaring protocol implementation:
+Conveniences can be provided for implementing protocols without repeating protocol names through a new ClassElement for declaring protocol implementation:
 
 ```js
 class NEList {
@@ -211,9 +211,8 @@ protocol P {
   b(){ print('b'); }
 }
 
-class C {
+class C implements P {
   a() {}
-  implements protocol P {}
 }
 
 C implements P; // true
