@@ -200,14 +200,14 @@ if (C implements P) {
 }
 ```
 
-### String required fields
+### Providing explicit member names
 
-Committee feedback was that string-based fields are required for FCPs to be able to describe protocols already in the language, such as thenables.
-This is possible by quoting the required member name in the protocol declaration:
+By default, both provided and required member names actually define symbols on the protocol object, which is a key part of how protocols avoid conflicts.
+It is possible to provide an explicit member name that will be used verbatim, by using [_ComputedPropertyName_](https://tc39.es/ecma262/#prod-ComputedPropertyName) syntax:
 
 ```js
 protocol P {
-  requires "a";
+  requires ["a"];
   b(){ print('b'); }
 }
 
@@ -217,6 +217,24 @@ class C implements P {
 
 C implements P; // true
 (new C)[P.b](); // prints 'b'
+```
+
+This makes it possible to describe protocols already in the language which is necessary per committee feedback.
+This includes protocols whose required members are strings, such as [thenables](examples/thenable.js),
+as well as protocols whose required members are existing symbols, such as the [iteration protocol](examples/iterable.js):
+
+```js
+protocol Iterable {
+  requires [Symbol.iterator];
+
+  forEach(f) {
+    for (let entry of this) {
+      f.call(this, entry);
+    }
+  }
+
+  // ...
+}
 ```
 
 
