@@ -39,7 +39,11 @@ Despite the syntactic similarity to class elements, the names of protocol member
 E.g. in this example, the required member is not a `"foldr"` property, but a `Foldable.foldr` symbol,
 and the two methods provided will not be added to classes as `"toArray"` or `"length"` properties, but as `Foldable.toArray` and `Foldable.length` symbols.
 
-Once a protocol is declared, it can be implemented on any class that satisfies the protocol's requirements (currently only property presence).
+Once a protocol is declared, it can be _implemented_ on any class that satisfies the protocol's requirements (currently only property presence).
+
+> [!IMPORTANT]
+> Currently the only constraint is around property presence. See issue [#4](https://github.com/tc39/proposal-first-class-protocols/issues/4) for discussion on additional constraint types.
+
 One possible syntax is via the `implements` keyword:
 ```js
 class C implements Foldable {
