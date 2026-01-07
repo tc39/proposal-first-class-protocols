@@ -24,7 +24,7 @@ protocol Foldable {
   // required members
   foldr;
 
-  // provided  fields
+  // provided members
   toArray() {
     return this[Foldable.foldr]((m, a) => [a].concat(m), []);
   }
@@ -126,6 +126,8 @@ class NEList {
 NEList.prototype[Functor.map] = function (f) {
   // implementation elided
 };
+
+Protocol.implement(NEList, Functor);
 ```
 
 ### Protocol composition
