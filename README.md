@@ -21,7 +21,7 @@ The syntax for declaring a protocol looks like this:
 
 ```js
 protocol Foldable {
-  // required  fields
+  // required members
   foldr;
 
   // provided  fields
