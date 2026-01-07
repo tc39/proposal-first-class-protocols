@@ -192,7 +192,7 @@ if (C implements P) {
 
 ### String required fields
 
-Committee Feedback was that string-based fields are required for FPPs to be able to describe protocols already in the language, such as thenables.
+Committee feedback was that string-based fields are required for FCPs to be able to describe protocols already in the language, such as thenables.
 This is possible by quoting the string in the protocol declaration:
 
 ```js
