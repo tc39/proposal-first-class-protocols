@@ -75,29 +75,6 @@ class C implements Foldable {
 }
 ```
 
-### Sugar for defining required members
-
-Conveniences can be provided for implementing protocols without repeating protocol names through a new ClassElement for declaring protocol implementation:
-
-```js
-class NEList {
-  constructor(head, tail) {
-    this.head = head;
-    this.tail = tail;
-  }
-
-  implements protocol Foldable {
-    // Sugar for defining [Foldable.foldr]
-    foldr (f, memo) {
-      // implementation elided
-    }
-  }
-}
-```
-
-> [!IMPORTANT]
-> Is this useful? Should it be generalized beyond protocols? See [#56](https://github.com/tc39/proposal-first-class-protocols/issues/56).
-
 ### Inline implementations for existing classes
 
 While typically classes are protocol consumers, protocols can also define implementations for existing classes, including built-in classes:
@@ -148,22 +125,16 @@ The syntax and semantics are similar to classes:
 protocol A { requires a; }
 protocol B extends A { requires b; }
 
-class C {
-  implements protocol B {
-    a() {}
-    b() {}
-  }
+class C implements B {
+  [B.a]() {}
+  [B.b]() {}
 }
 
 // or
 
-class C {
-  implements protocol A {
-    a() {}
-  }
-  implements protocol B {
-    b() {}
-  }
+class C implements A, B {
+  [A.a]() {}
+  [B.b]() {}
 }
 ```
 
@@ -415,3 +386,11 @@ in doing it properly, see the output of the sweet.js implementation.
 
 * [July 2018 presentation to the committee](/July%202018%20Update_%20ECMAScript%20Proposal_%20First-Class%20Protocols.pdf)
 * [Initial proposal at the September 2017 TC39 meeting](https://github.com/tc39/agendas/blob/master/2017/09.md)
+
+## Changelog
+
+### From the 2018 update
+
+- Removed the `implements` ClassElement syntax ([#56](https://github.com/tc39/proposal-first-class-protocols/issues/56#issuecomment-3717193577))
+- Explicit member names now use ComputedPropertyName syntax ([#48](https://github.com/tc39/proposal-first-class-protocols/issues/48))
+- Added explicit `requires` keyword ([#50](https://github.com/tc39/proposal-first-class-protocols/issues/50))
