@@ -140,7 +140,9 @@ Protocol.implement(NEList, Functor);
 
 ### Protocol composition
 
-Like classes, protocols can use inheritance to compose progressively more complex protocols from simpler ones:
+Once created, protocols are frozen and cannot be modified.
+Instead, inheritance can be used to create new protocols from existing ones.
+The syntax and semantics are similar to classes:
 
 ```js
 protocol A { requires a; }
@@ -164,6 +166,9 @@ class C {
   }
 }
 ```
+
+> [!IMPORTANT]
+> See issue [#23](https://github.com/tc39/proposal-first-class-protocols/issues/23) for discussion on the exact implementation and semantics of protocol composition.
 
 ### Imperative protocol construction
 
