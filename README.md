@@ -13,6 +13,30 @@ Champions:
 - Michael Ficarra (@michaelficarra)
 - Lea Verou (@leaverou)
 
+## Contents
+
+1. [What does it look like?](#what-does-it-look-like)
+   1. [Basic syntax](#basic-syntax)
+   2. [Inline implementations for existing classes](#inline-implementations-for-existing-classes)
+   3. [Dynamic implementation](#dynamic-implementation)
+   4. [Protocol composition](#protocol-composition)
+   5. [Imperative protocol construction](#imperative-protocol-construction)
+   6. [Querying protocol membership](#querying-protocol-membership)
+   7. [Providing explicit member names](#providing-explicit-member-names)
+2. [How can I play with it?](#how-can-i-play-with-it)
+3. [What is it used for?](#what-is-it-used-for)
+4. [Relationship to similar features](#relationship-to-similar-features)
+   1. [Haskell type classes](#haskell-type-classes)
+   2. [Rust traits](#rust-traits)
+   3. [Java 8+ interfaces](#java-8-interfaces)
+   4. [Ruby mixins](#ruby-mixins)
+   5. [ECMAScript `mixin(...)` pattern](#ecmascript-mixin-pattern)
+5. [Links to previous related discussions/strawmen](#links-to-previous-related-discussionsstrawmen)
+6. [History](#history)
+7. [Changelog](#changelog)
+   1. [From the 2018 update](#from-the-2018-update)
+
+
 ## What does it look like?
 
 ### Basic syntax
