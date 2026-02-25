@@ -148,7 +148,7 @@ protocol Foldable {
     return this[Foldable.foldr](m => m + 1, 0);
   }
 
-  requires constructor implements {
+  requires ["constructor"] implements protocol {
     from () { /* elided */ }
   }
 }
