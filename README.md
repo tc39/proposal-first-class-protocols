@@ -16,13 +16,16 @@ Champions:
 ## Contents
 
 1. [What does it look like?](#what-does-it-look-like)
-   1. [Basic syntax](#basic-syntax)
-   2. [Inline implementations for existing classes](#inline-implementations-for-existing-classes)
-   3. [Dynamic implementation](#dynamic-implementation)
-   4. [Protocol composition](#protocol-composition)
-   5. [Imperative protocol construction](#imperative-protocol-construction)
-   6. [Querying protocol membership](#querying-protocol-membership)
-   7. [Providing explicit member names](#providing-explicit-member-names)
+   1. [Defining protocols](#defining-protocols)
+   2. [Implementing protocols on objects](#implementing-protocols-on-objects)
+   3. [Specifying and implementing protocols on constructors](#specifying-and-implementing-protocols-on-constructors)
+   4. [Sub-protocols](#sub-protocols)
+   5. [Inline implementations for existing classes](#inline-implementations-for-existing-classes)
+   6. [Protocol composition](#protocol-composition)
+   7. [Imperative protocol construction](#imperative-protocol-construction)
+   8. [Protocol introspection](#protocol-introspection)
+   9. [Querying protocol membership](#querying-protocol-membership)
+   10. [Providing explicit member names](#providing-explicit-member-names)
 2. [How can I play with it?](#how-can-i-play-with-it)
 3. [What is it used for?](#what-is-it-used-for)
 4. [Relationship to similar features](#relationship-to-similar-features)
@@ -34,12 +37,13 @@ Champions:
 5. [Links to previous related discussions/strawmen](#links-to-previous-related-discussionsstrawmen)
 6. [History](#history)
 7. [Changelog](#changelog)
-   1. [From the 2018 update](#from-the-2018-update)
+   1. [Feb 24, 2026](#feb-24-2026)
+   2. [From the 2018 update](#from-the-2018-update)
 
 
 ## What does it look like?
 
-### Basic syntax
+### Defining protocols
 
 The syntax for declaring a protocol looks like this:
 
@@ -62,24 +66,51 @@ protocol Foldable {
 
 Required members are defined by the `requires` keyword.
 Any other member is _provided_.
+Protocols can have only required members, only provided members, or both.
 
 Despite the syntactic similarity to class elements, the names of protocol members are actually **symbols**, which ensures uniqueness and prevents name collisions.
 E.g. in this example, the required member is not a `"foldr"` property, but a `Foldable.foldr` symbol,
 and the two methods provided will not be added to classes as `"toArray"` or `"length"` properties, but as `Foldable.toArray` and `Foldable.length` symbols.
 
-Once a protocol is declared, it can be _implemented_ on any class that satisfies the protocol's requirements.
+### Implementing protocols on objects
+
+Once a protocol is declared, it can be _implemented_ on any object that satisfies the protocol's requirements through a `Protocol.implement()` method.
 
 > [!IMPORTANT]
 > Currently the only constraint is around property presence. See issue [#4](https://github.com/tc39/proposal-first-class-protocols/issues/4) for discussion on additional constraint types.
 
-One possible syntax is via the `implements` keyword:
+Implementing a protocol on an object is equivalent to copying the protocol's members to the object.
+
+```js
+let obj = {
+  [Foldable.foldr](f, memo) {
+    // implementation elided
+  }
+}
+Protocol.implement(obj, Foldable);
+//=> obj[Foldable.toArray] and obj[Foldable.length] are now available
+```
+
+
+### Specifying and implementing protocols on constructors
+
+In addition to `Protocol.implement()`, which works for any object, constructors support declaratively implementing protocols on their prototype via the `implements` keyword:
+
 ```js
 class C implements Foldable {
   [Foldable.foldr](f, memo) {
     // implementation elided
   }
 }
+
+
+//=> C.prototype[Foldable.toArray] and C.prototype[Foldable.length] are now available
+//=> C.prototype implements Foldable === true
+let c = new C();
+//=> c implements Foldable === true
 ```
+
+When protocols are implemented on constructors (via the `class C implements P` syntax), they are installed on the class `.prototype` object.
 
 By implementing `Foldable`, class `C` now gained a `C.prototype[Foldable.toArray]` method and a `C.prototype[Foldable.length]` accessor, which it can choose to expose to the outside world like so:
 
@@ -99,6 +130,42 @@ class C implements Foldable {
 }
 ```
 
+### Sub-protocols
+
+A required member can also be required to implement one or more sub-protocols, specified inline or by reference.
+
+This can be used to specify static members on protocols meant to be used on classes:
+
+```js
+protocol Foldable {
+  requires foldr;
+
+  // provided members
+  toArray() {
+    return this[Foldable.foldr]((m, a) => [a].concat(m), []);
+  }
+  get length() {
+    return this[Foldable.foldr](m => m + 1, 0);
+  }
+
+  requires constructor implements {
+    from () { /* elided */ }
+  }
+}
+
+class C implements Foldable {
+  [Foldable.foldr](f, memo) {
+    // implementation elided
+  }
+}
+
+//=> C.prototype.constructor[Foldable.from] is now available
+// Therefore, C[Foldable.from] is now available
+```
+
+>[!IMPORTANT]
+> `constructor` and `prototype` are _always_ implicitly strings and do not create symbols on the protocol object.
+
 ### Inline implementations for existing classes
 
 While typically classes are protocol consumers, protocols can also define implementations for existing classes, including built-in classes:
@@ -117,27 +184,6 @@ protocol Foldable {
 
 > [!IMPORTANT]
 > Is this MVP, given `Protocol.implement()` can also do this? See issue [#63](https://github.com/tc39/proposal-first-class-protocols/issues/63).
-
-### Dynamic implementation
-
-Protocol implementation can also be entirely decoupled from both protocol and class definition, via the `Protocol.implement()` function:
-
-```js
-protocol Functor { map; }
-
-class NEList {
-  constructor(head, tail) {
-    this.head = head;
-    this.tail = tail;
-  }
-}
-
-NEList.prototype[Functor.map] = function (f) {
-  // implementation elided
-};
-
-Protocol.implement(NEList, Functor);
-```
 
 ### Protocol composition
 
@@ -174,26 +220,52 @@ All options are optional.
 const Foldable = new Protocol({
   name: 'Foldable',
   extends: [ ... ],
-  requires: {
-    foldr: Symbol('Foldable.foldr'),
-  },
-  staticRequires: { ... },
-  provides:
-    Object.getOwnPropertyDescriptors({
-      toArray() { ... },
-      get length() { ... },
-      contains(eq, e) { ... },
-    }),
-  staticProvides: // ...,
+  members: {
+    foldr: { required: true },
+    toArray: {
+      value: function () { ... },
+    },
+    length: {
+      get: function () { ... },
+      set: function (value) { ... },
+    },
+    contains: {
+      value: function (eq, e) { ... },
+    },
+  }
 });
+```
+
+### Protocol introspection
+
+`Protocol.describe(p)` takes an existing protocol object and returns an object literal that could be passed to the constructor to create a new protocol.
+
+```js
+const P = Protocol.describe(Foldable);
+// => {
+//   name: 'Foldable',
+//   members: {
+//     foldr: { required: true },
+//     toArray: {
+//       value: function () { ... },
+//     },
+//     length: {
+//       get: function () { ... },
+//       set: function (value) { ... },
+//     },
+//     contains: {
+//       value: function (eq, e) { ... },
+//     },
+//   }
+// }
 ```
 
 ### Querying protocol membership
 
-An `implements` operator can be used to query protocol membership, by checking whether a class satisfies a protocol's requirements and includes its provided members.
+An `implements` operator can be used to query protocol membership, by checking whether an object satisfies a protocol's requirements and includes its provided members.
 
 ```js
-if (C implements P) {
+if (obj implements P) {
   // reached iff C has all fields
   // required by P and all fields
   // provided by P
@@ -412,6 +484,13 @@ in doing it properly, see the output of the sweet.js implementation.
 * [Initial proposal at the September 2017 TC39 meeting](https://github.com/tc39/agendas/blob/master/2017/09.md)
 
 ## Changelog
+
+### Feb 24, 2026
+
+- Removed `static` members
+- Added sub-protocols
+- Edited constructor signature to represent current thinking
+- Added `Protocol.describe()`
 
 ### From the 2018 update
 
