@@ -110,7 +110,7 @@ let c = new C();
 //=> c implements Foldable === true
 ```
 
-When protocols are implemented on constructors (via the `class C implements P` syntax), they are installed on the class `.prototype` object.
+When protocols are implemented on constructors (via the `class C implements P` syntax), they are installed on the class `.prototype` object, i.e. they are equivalent to `Protocol.implement(C.prototype, P)`.
 
 By implementing `Foldable`, class `C` now gained a `C.prototype[Foldable.toArray]` method and a `C.prototype[Foldable.length]` accessor, which it can choose to expose to the outside world like so:
 
