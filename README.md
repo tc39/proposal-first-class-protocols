@@ -266,7 +266,7 @@ An `implements` operator can be used to query protocol membership, by checking w
 
 ```js
 if (obj implements P) {
-  // reached iff C has all fields
+  // reached iff obj has all fields
   // required by P and all fields
   // provided by P
 }
