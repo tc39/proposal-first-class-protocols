@@ -21,12 +21,11 @@ Champions:
 3. [Additional Features](#additional-features)
    1. [Specifying and implementing protocols on constructors](#specifying-and-implementing-protocols-on-constructors)
    2. [Sub-protocols](#sub-protocols)
-   3. [Inline implementations for existing classes](#inline-implementations-for-existing-classes)
-   4. [Protocol composition](#protocol-composition)
-   5. [Imperative protocol construction](#imperative-protocol-construction)
-   6. [Protocol introspection](#protocol-introspection)
-   7. [Querying protocol membership](#querying-protocol-membership)
-   8. [Providing explicit member names](#providing-explicit-member-names)
+   3. [Protocol composition](#protocol-composition)
+   4. [Imperative protocol construction](#imperative-protocol-construction)
+   5. [Protocol introspection](#protocol-introspection)
+   6. [Querying protocol membership](#querying-protocol-membership)
+   7. [Providing explicit member names](#providing-explicit-member-names)
 4. [How can I play with it?](#how-can-i-play-with-it)
 5. [Relationship to similar features](#relationship-to-similar-features)
    1. [Haskell type classes](#haskell-type-classes)
@@ -248,25 +247,6 @@ class C implements Foldable {
 
 >[!IMPORTANT]
 > Should `constructor` and `prototype` be _always_ implicitly strings and not create symbols on the protocol object? See issue [#84](https://github.com/tc39/proposal-first-class-protocols/issues/84)
-
-### Inline implementations for existing classes
-
-While typically classes are protocol consumers, protocols can also define implementations for existing classes, including built-in classes:
-
-```js
-protocol Foldable {
-  // ...
-
-  implemented by Array {
-    foldr (f, memo) {
-      // implementation elided
-    }
-  }
-}
-```
-
-> [!IMPORTANT]
-> Is this MVP, given `Protocol.implement()` can also do this? See issue [#63](https://github.com/tc39/proposal-first-class-protocols/issues/63).
 
 ### Protocol composition
 
