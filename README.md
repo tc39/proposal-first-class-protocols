@@ -292,7 +292,7 @@ class C implements P {
   a() {}
 }
 
-C implements P; // true
+C.prototype implements P; // true
 (new C)[P.b](); // prints 'b'
 ```
 
@@ -376,7 +376,7 @@ Promise.prototype[Functor.map] = function (f) {
   });
 };
 
-Protocol.implement(Promise, Functor);
+Protocol.implement(Promise.prototype, Functor);
 ```
 
 Finally, one of the biggest benefits of protocols is that they eliminate the
@@ -402,7 +402,7 @@ protocol Ordered {
 }
 
 String.prototype[Ordered.compare] = function() { /* elided */ };
-Protocol.implement(String, Ordered);
+Protocol.implement(String.prototype, Ordered);
 ```
 
 
