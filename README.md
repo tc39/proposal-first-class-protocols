@@ -165,7 +165,7 @@ class C implements Foldable {
 > [!IMPORTANT]
 > Actually, `Foldable.from` would *not* be available. This is an open design dilemma, see #81 for discussion.
 >[!IMPORTANT]
-> `constructor` and `prototype` are _always_ implicitly strings and do not create symbols on the protocol object.
+> Should `constructor` and `prototype` be _always_ implicitly strings and not create symbols on the protocol object? See issue [#84](https://github.com/tc39/proposal-first-class-protocols/issues/84)
 
 ### Inline implementations for existing classes
 
