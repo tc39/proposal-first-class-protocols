@@ -237,6 +237,9 @@ const Foldable = new Protocol({
 });
 ```
 
+> [!IMPORTANT]
+> The exact shape is TBD (see [#82](https://github.com/tc39/proposal-first-class-protocols/issues/82)). One design decision that affects it is whether `"foo"` and `foo` are distinct members (see [#59]([#82](https://github.com/tc39/proposal-first-class-protocols/issues/59))).
+
 ### Protocol introspection
 
 `Protocol.describe(p)` takes an existing protocol object and returns an object literal that could be passed to the constructor to create a new protocol.
@@ -261,8 +264,6 @@ const P = Protocol.describe(Foldable);
 // }
 ```
 
-> [!IMPORTANT]
-> The exact shape is TBD (see #82). One design decision that affects it is whether `"foo"` and `foo` are distinct members (see #59).
 ### Querying protocol membership
 
 An `implements` operator can be used to query protocol membership, by checking whether an object satisfies a protocol's requirements and includes its provided members.
