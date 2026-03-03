@@ -162,7 +162,8 @@ class C implements Foldable {
 //=> C.prototype.constructor[Foldable.from] is now available
 // Therefore, C[Foldable.from] is now available
 ```
-
+> [!IMPORTANT]
+> Actually, `Foldable.from` would *not* be available. This is an open design dilemma, see #81 for discussion.
 >[!IMPORTANT]
 > `constructor` and `prototype` are _always_ implicitly strings and do not create symbols on the protocol object.
 
