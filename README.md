@@ -163,7 +163,8 @@ class C implements Foldable {
 // Therefore, C[Foldable.from] is now available
 ```
 > [!IMPORTANT]
-> Actually, `Foldable.from` would *not* be available. This is an open design dilemma, see #81 for discussion.
+> Actually, `Foldable.from` would *not* be available. This is an open design dilemma, see [#81](https://github.com/tc39/proposal-first-class-protocols/issues/81) for discussion.
+
 >[!IMPORTANT]
 > Should `constructor` and `prototype` be _always_ implicitly strings and not create symbols on the protocol object? See issue [#84](https://github.com/tc39/proposal-first-class-protocols/issues/84)
 
