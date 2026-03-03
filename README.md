@@ -239,7 +239,7 @@ const Foldable = new Protocol({
 ```
 
 > [!IMPORTANT]
-> The exact shape is TBD (see [#82](https://github.com/tc39/proposal-first-class-protocols/issues/82)). One design decision that affects it is whether `"foo"` and `foo` are distinct members (see [#59]([#82](https://github.com/tc39/proposal-first-class-protocols/issues/59))).
+> The exact shape is TBD (see [#82](https://github.com/tc39/proposal-first-class-protocols/issues/82)). One design decision that affects it is whether `"foo"` and `foo` are distinct members (see [#59](https://github.com/tc39/proposal-first-class-protocols/issues/59)).
 
 ### Protocol introspection
 
