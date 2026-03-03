@@ -43,8 +43,6 @@ Champions:
 
 ## What does it look like?
 
-### Defining protocols
-
 The syntax for declaring a protocol looks like this:
 
 ```js
@@ -91,6 +89,89 @@ Protocol.implement(obj, Foldable);
 //=> obj[Foldable.toArray] and obj[Foldable.length] are now available
 ```
 
+## Motivation
+
+The most well-known protocol in ECMAScript is the iteration protocol. APIs such
+as `Array.from`, the `Map` and `Set` constructors, destructuring syntax, and
+`for-of` syntax are all built around this protocol. But there are many others.
+For example, the protocol defined by `Symbol.toStringTag` could have been
+expressed using protocols as
+
+```js
+protocol ToString {
+  requires tag;
+
+  toString() {
+    return `[object ${this[ToString.tag]}]`;
+  }
+}
+
+Object.prototype[ToString.tag] = 'Object';
+Protocol.implement(Object.prototype, ToString);
+```
+
+The auto-flattening behaviour of `Promise.prototype.then` was a very controversial decision.
+Valid arguments exist for both the auto-flattening and the monadic versions to be the default.
+Protocols eliminate this issue in two ways:
+
+1. Symbols are unique and unambiguous. There is no fear of naming collisions,
+   and it is clear what function you are using.
+1. Protocols may be applied to existing classes, so there is nothing
+   preventing consumers with different goals from using their own methods.
+
+```js
+protocol Functor {
+  requires map;
+}
+
+class Identity {
+  constructor(val) { this.val = val; }
+  unwrap() { return this.val; }
+}
+
+Promise.prototype[Functor.map] = function (f) {
+  return this.then(function(x) {
+    if (x instanceof Identity) {
+      x = x.unwrap();
+    }
+    let result = f.call(this, x);
+    if (result instanceof Promise) {
+      result = new Identity(result);
+    }
+    return result;
+  });
+};
+
+Protocol.implement(Promise.prototype, Functor);
+```
+
+Finally, one of the biggest benefits of protocols is that they eliminate the
+fear of mutating built-in prototypes. One of the beautiful aspects of
+ECMAScript is its ability to extend its built-in prototypes. But with the
+limited string namespace, this is untenable in large codebases and impossible
+when integrating with third parties. Because protocols are based on symbols,
+this is no longer an anti-pattern.
+
+```js
+class Ordering {
+  static LT = new Ordering;
+  static EQ = new Ordering;
+  static GT = new Ordering;
+}
+
+protocol Ordered {
+  requires compare;
+
+  lessThan(other) {
+    return this[Ordered.compare](other) === Ordering.LT;
+  }
+}
+
+String.prototype[Ordered.compare] = function() { /* elided */ };
+Protocol.implement(String.prototype, Ordered);
+```
+
+## Additional Features
 
 ### Specifying and implementing protocols on constructors
 
@@ -321,90 +402,6 @@ An outdated prototype using [sweet.js](https://www.sweetjs.org/) is available at
 https://github.com/disnet/sweet-interfaces. It needs to be updated to use the
 latest syntax. A polyfill for the runtime components is available at
 https://github.com/michaelficarra/proposal-first-class-protocols-polyfill.
-
-
-## What is it used for?
-
-The most well-known protocol in ECMAScript is the iteration protocol. APIs such
-as `Array.from`, the `Map` and `Set` constructors, destructuring syntax, and
-`for-of` syntax are all built around this protocol. But there are many others.
-For example, the protocol defined by `Symbol.toStringTag` could have been
-expressed using protocols as
-
-```js
-protocol ToString {
-  requires tag;
-
-  toString() {
-    return `[object ${this[ToString.tag]}]`;
-  }
-}
-
-Object.prototype[ToString.tag] = 'Object';
-Protocol.implement(Object.prototype, ToString);
-```
-
-The auto-flattening behaviour of `Promise.prototype.then` was a very controversial decision.
-Valid arguments exist for both the auto-flattening and the monadic versions to be the default.
-Protocols eliminate this issue in two ways:
-
-1. Symbols are unique and unambiguous. There is no fear of naming collisions,
-   and it is clear what function you are using.
-1. Protocols may be applied to existing classes, so there is nothing
-   preventing consumers with different goals from using their own methods.
-
-```js
-protocol Functor {
-  requires map;
-}
-
-class Identity {
-  constructor(val) { this.val = val; }
-  unwrap() { return this.val; }
-}
-
-Promise.prototype[Functor.map] = function (f) {
-  return this.then(function(x) {
-    if (x instanceof Identity) {
-      x = x.unwrap();
-    }
-    let result = f.call(this, x);
-    if (result instanceof Promise) {
-      result = new Identity(result);
-    }
-    return result;
-  });
-};
-
-Protocol.implement(Promise.prototype, Functor);
-```
-
-Finally, one of the biggest benefits of protocols is that they eliminate the
-fear of mutating built-in prototypes. One of the beautiful aspects of
-ECMAScript is its ability to extend its built-in prototypes. But with the
-limited string namespace, this is untenable in large codebases and impossible
-when integrating with third parties. Because protocols are based on symbols,
-this is no longer an anti-pattern.
-
-```js
-class Ordering {
-  static LT = new Ordering;
-  static EQ = new Ordering;
-  static GT = new Ordering;
-}
-
-protocol Ordered {
-  requires compare;
-
-  lessThan(other) {
-    return this[Ordered.compare](other) === Ordering.LT;
-  }
-}
-
-String.prototype[Ordered.compare] = function() { /* elided */ };
-Protocol.implement(String.prototype, Ordered);
-```
-
 
 ## Relationship to similar features
 
