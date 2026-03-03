@@ -341,7 +341,7 @@ protocol ToString {
 }
 
 Object.prototype[ToString.tag] = 'Object';
-Protocol.implement(Object, ToString);
+Protocol.implement(Object.prototype, ToString);
 ```
 
 The auto-flattening behaviour of `Promise.prototype.then` was a very controversial decision.
