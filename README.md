@@ -77,7 +77,7 @@ and the two methods provided will not be added to classes as `"toArray"` or `"le
 Once a protocol is declared, it can be _implemented_ on any object that satisfies the protocol's requirements through a `Protocol.implement()` method.
 
 > [!IMPORTANT]
-> Currently the only constraint is around property presence. See issue [#4](https://github.com/tc39/proposal-first-class-protocols/issues/4) for discussion on additional constraint types.
+> Currently the only constraint implied by `requires` is that the property is present. See issue [#4](https://github.com/tc39/proposal-first-class-protocols/issues/4) for discussion on additional constraint types.
 
 Implementing a protocol on an object is equivalent to copying the protocol's members to the object.
 
