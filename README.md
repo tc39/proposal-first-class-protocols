@@ -26,6 +26,7 @@ Champions:
    5. [Protocol introspection](#protocol-introspection)
    6. [Querying protocol membership](#querying-protocol-membership)
    7. [Providing explicit member names](#providing-explicit-member-names)
+   8. [Automatically creating string aliases for all provided members](#automatically-creating-string-aliases-for-all-provided-members)
 4. [How can I play with it?](#how-can-i-play-with-it)
 5. [Relationship to similar features](#relationship-to-similar-features)
    1. [Haskell type classes](#haskell-type-classes)
@@ -375,6 +376,23 @@ protocol Iterable {
 }
 ```
 
+
+### Automatically creating string aliases for all provided members
+
+While symbol-based names are the default (and desirable for avoiding conflicts), many real-world use cases involve protocols whose members should also be available as regular string-named properties on the implementing object.
+By default, the implementing object needs to define mappings between the symbol-based names the protocol defines and the string-based names it wants to expose, which can be tedious.
+
+While protocols *could* define all their provided members as string-named properties, this moves control from the object to the protocol, which is not always desirable.
+In some cases protocols are implemented to add functionality that primarily meant to be used internally, while in other cases they are meant to also add API that exposes this functionality to consumers of the object.
+
+To allow for object authors to make that call, protocol syntax supports a convenience syntax that automatically creates string aliases for all provided members as accessors on the implementing object.
+
+The exact syntax is TBD, discussed in issue [#47](https://github.com/tc39/proposal-first-class-protocols/issues/47).
+
+Some (not necessarily mutually exclusive) ideas include:
+- an extension to the `implements` syntax (e.g. `class C implements Foldable with strings`)
+- a `Protocol.implement()` option (e.g. `Protocol.implement(obj, Foldable, { withStrings: true })`)
+- a method that transforms a protocol into another protocol that also provides string aliases for all provided members (e.g. `class C implements Foldable.withStrings(P)`)
 
 ## How can I play with it?
 
