@@ -394,6 +394,10 @@ Some (not necessarily mutually exclusive) ideas include:
 - a `Protocol.implement()` option (e.g. `Protocol.implement(obj, Foldable, { withStrings: true })`)
 - a method that transforms a protocol into another protocol that also provides string aliases for all provided members (e.g. `class C implements Foldable.withStrings(P)`)
 
+### interaction with private names
+
+A protocol that provides properties with private names which are only available to reference by other protocol members seems clearly useful. But this proposal is still valuable without support for private names. For now, private names in protocols are an early error. Private names in protocols can and should be pursued as a follow-up proposal. This topic is being tracked in [#66](https://github.com/tc39/proposal-first-class-protocols/issues/66).
+
 ## How can I play with it?
 
 An outdated prototype using [sweet.js](https://www.sweetjs.org/) is available at
