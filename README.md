@@ -379,7 +379,7 @@ protocol Iterable {
 
 ### Automatically creating string aliases for all provided members
 
-While symbol-based names are the default (and desirable for avoiding conflicts), many real-world use cases involve protocols whose members should also be available as regular string-named properties on the implementing object.
+While symbol-based names are the default (and desirable for avoiding conflicts), many use cases require integration with implementors of existing ad hoc protocols that are defined in terms of regular string-named properties.
 By default, the implementing object needs to define mappings between the symbol-based names the protocol defines and the string-based names it wants to expose, which can be tedious.
 
 While protocols *could* define all their provided members as string-named properties, this moves control from the object to the protocol, which is not always desirable.
