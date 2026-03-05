@@ -376,6 +376,17 @@ protocol Iterable {
 }
 ```
 
+### Providing non-method data properties
+
+As seen throughout the rest of this explainer, protocols may provide methods and accessors using the same notation used within class declarations. In addition to those, protocols may provide data properties with any value using the following notation:
+
+```js
+protocol P {
+  x = 0
+}
+```
+
+In the above example, protocol `P` provides a member named `x` with value `0`. This differs from the meaning of the similar construct within class declarations, where it would define a class field with a field initializer. Class field initializers are expressions that are evaluated each time a class is instantiated, whereas the expression following `=` in the protocol above is evaluated only once, during the protocol evaluation.
 
 ### Automatically creating string aliases for all provided members
 
