@@ -409,7 +409,7 @@ The exact syntax is TBD, discussed in issue [#47](https://github.com/tc39/propos
 Some (not necessarily mutually exclusive) ideas include:
 - an extension to the `implements` syntax (e.g. `class C implements Foldable with strings`)
 - a `Protocol.implement()` option (e.g. `Protocol.implement(obj, Foldable, { withStrings: true })`)
-- a method that transforms a protocol into another protocol that also provides string aliases for all provided members (e.g. `class C implements Foldable.withStrings(P)`)
+- a method that transforms a protocol into another protocol that also provides string aliases for all provided members (e.g. `class C implements Protocol.withStrings(P)`)
 
 ### interaction with private names
 
