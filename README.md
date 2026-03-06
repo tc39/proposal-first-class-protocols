@@ -28,7 +28,7 @@ Champions:
    7. [Providing explicit member names](#providing-explicit-member-names)
    8. [Providing non-method data properties](#providing-non-method-data-properties)
    9. [Automatically creating string aliases for all provided members](#automatically-creating-string-aliases-for-all-provided-members)
-   10. [interaction with private names](#interaction-with-private-names)
+   10. [Interaction with private names](#interaction-with-private-names)
 4. [Patterns](#patterns)
    1. [Conflict resolution \& disambiguation](#conflict-resolution--disambiguation)
 5. [How can I play with it?](#how-can-i-play-with-it)
@@ -411,7 +411,7 @@ Some (not necessarily mutually exclusive) ideas include:
 - a `Protocol.implement()` option (e.g. `Protocol.implement(obj, Foldable, { withStrings: true })`)
 - a method that transforms a protocol into another protocol that also provides string aliases for all provided members (e.g. `class C implements Protocol.withStrings(P)`)
 
-### interaction with private names
+### Interaction with private names
 
 A protocol that provides properties with private names which are only available to reference by other protocol members seems clearly useful. But this proposal is still valuable without support for private names. For now, private names in protocols are an early error. Private names in protocols can and should be pursued as a follow-up proposal. This topic is being tracked in [#66](https://github.com/tc39/proposal-first-class-protocols/issues/66).
 
