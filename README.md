@@ -29,6 +29,7 @@ Champions:
 5. [Imperative API](#imperative-api)
    1. [The `Protocol()` constructor](#the-protocol-constructor)
    2. [Protocol introspection: `Protocol.describe()`](#protocol-introspection-protocoldescribe)
+   3. [Protocol flattening: `Protocol.union()`](#protocol-flattening-protocolunion)
 6. [Convenience Features](#convenience-features)
    1. [Specifying and implementing protocols on constructors](#specifying-and-implementing-protocols-on-constructors)
    2. [Automatically creating string aliases for all provided members](#automatically-creating-string-aliases-for-all-provided-members)
@@ -316,6 +317,8 @@ class C implements A, B {
 
 ## Imperative API
 
+In addition to `Protocol.implement()` which has been described earlier, a few other imperative API methods are available.
+
 ### The `Protocol()` constructor
 
 Protocols can also be constructed imperatively, via the `Protocol()` constructor.
@@ -369,6 +372,40 @@ const P = Protocol.describe(Foldable);
 ```
 
 
+### Protocol flattening: `Protocol.union()`
+
+`Protocol.implement()` is atomic, and will throw an error if the object does not satisfy the protocol's requirements.
+However, when implementing multiple protocols on a single object, some of their requirements may be satisfied by other protocols.
+Consider this example:
+
+```js
+protocol A { requires ["a"]; ["b"]() {} }
+protocol B { requires ["b"]; ["c"]() {} }
+protocol C { requires ["c"]; ["a"]() {} }
+
+let obj = {};
+```
+
+All of the following calls will throw:
+- `Protocol.implement(obj, A);`
+- `Protocol.implement(obj, B);`
+- `Protocol.implement(obj, C);`
+
+There is _no_ order in which we can call `Protocol.implement()` on `obj` to avoid errors, even though _all_ their requirements are satisfied by another protocol in the group.
+
+To address this, we can combine protocols into a single protocol by taking a deep union of all required and provided members.
+The resulting protocol satisfies `implements` checks for all protocols in the group, but requirements are checked for the entire set, rather than for each protocol individually.
+
+```js
+Protocol.implement(obj, Protocol.union(A, B, C)); // no errors!
+```
+
+> [!NOTE]
+> A protocol may require and provide the same member name.
+> This does not throw an error, the requirement is simply trivially satisfied.
+> This can easily happen when flattening protocols, e.g. in the example above,
+> `Protocol.union(A, B, C)` will result in a protocol that requires all its provided members.
+
 ## Convenience Features
 
 ### Specifying and implementing protocols on constructors
@@ -407,6 +444,17 @@ class C implements Foldable {
     return this[Foldable.length];
   }
 }
+```
+
+Multiple protocols can be implemented by passing a list of protocols to the `implements` keyword.
+In that case, protocols are wrapped in `Protocol.union()` before being passed to `Protocol.implement()`, to ensure that only real requirements propagate to the constructor itself.
+
+```js
+class C implements P, Q { /* ... */ }
+
+// Equivalent to:
+class C { /* ... */ }
+Protocol.implement(C.prototype, Protocol.union(P, Q));
 ```
 
 ### Automatically creating string aliases for all provided members
