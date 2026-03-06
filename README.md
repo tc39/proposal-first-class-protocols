@@ -18,31 +18,34 @@ Champions:
 1. [What does it look like?](#what-does-it-look-like)
    1. [Implementing protocols on objects](#implementing-protocols-on-objects)
 2. [Motivation](#motivation)
-3. [Additional Features](#additional-features)
-   1. [Providing explicit member names](#providing-explicit-member-names)
-   2. [Providing non-method data properties](#providing-non-method-data-properties)
-   3. [Specifying and implementing protocols on constructors](#specifying-and-implementing-protocols-on-constructors)
-   4. [Sub-protocols](#sub-protocols)
-   5. [Protocol composition](#protocol-composition)
-   6. [Imperative protocol construction](#imperative-protocol-construction)
-   7. [Protocol introspection](#protocol-introspection)
-   8. [Querying protocol membership](#querying-protocol-membership)
-   9. [Automatically creating string aliases for all provided members](#automatically-creating-string-aliases-for-all-provided-members)
-   10. [Interaction with private names](#interaction-with-private-names)
-4. [Patterns](#patterns)
+3. [Syntax in depth](#syntax-in-depth)
+   1. [Querying protocol membership](#querying-protocol-membership)
+   2. [Providing explicit member names](#providing-explicit-member-names)
+   3. [Providing non-method data properties](#providing-non-method-data-properties)
+   4. [Interaction with private names](#interaction-with-private-names)
+4. [Protocol composition](#protocol-composition)
+   1. [Sub-protocols](#sub-protocols)
+   2. [Inheritance](#inheritance)
+5. [Imperative API](#imperative-api)
+   1. [The `Protocol()` constructor](#the-protocol-constructor)
+   2. [Protocol introspection: `Protocol.describe()`](#protocol-introspection-protocoldescribe)
+6. [Convenience Features](#convenience-features)
+   1. [Specifying and implementing protocols on constructors](#specifying-and-implementing-protocols-on-constructors)
+   2. [Automatically creating string aliases for all provided members](#automatically-creating-string-aliases-for-all-provided-members)
+7. [Patterns](#patterns)
    1. [Conflict resolution \& disambiguation](#conflict-resolution--disambiguation)
-5. [How can I play with it?](#how-can-i-play-with-it)
-6. [Relationship to similar features](#relationship-to-similar-features)
+8. [How can I play with it?](#how-can-i-play-with-it)
+9. [Relationship to similar features](#relationship-to-similar-features)
    1. [Haskell type classes](#haskell-type-classes)
    2. [Rust traits](#rust-traits)
    3. [Java 8+ interfaces](#java-8-interfaces)
    4. [Ruby mixins](#ruby-mixins)
    5. [ECMAScript `mixin(...)` pattern](#ecmascript-mixin-pattern)
-7. [Links to previous related discussions/strawmen](#links-to-previous-related-discussionsstrawmen)
-8. [History](#history)
-9. [Changelog](#changelog)
-   1. [Feb 24, 2026](#feb-24-2026)
-   2. [From the 2018 update](#from-the-2018-update)
+10. [Links to previous related discussions/strawmen](#links-to-previous-related-discussionsstrawmen)
+11. [History](#history)
+12. [Changelog](#changelog)
+    1. [Feb 24, 2026](#feb-24-2026)
+    2. [From the 2018 update](#from-the-2018-update)
 
 
 ## What does it look like?
@@ -177,7 +180,19 @@ String.prototype[Ordered.compare] = function() { /* elided */ };
 Protocol.implement(String.prototype, Ordered);
 ```
 
-## Additional Features
+## Syntax in depth
+
+### Querying protocol membership
+
+An `implements` operator can be used to query protocol membership, by checking whether an object satisfies a protocol's requirements and includes its provided members.
+
+```js
+if (obj implements P) {
+  // reached iff obj has all fields
+  // required by P and all fields
+  // provided by P
+}
+```
 
 ### Providing explicit member names
 
@@ -228,43 +243,12 @@ protocol P {
 
 In the above example, protocol `P` provides a member named `x` with value `0`. This differs from the meaning of the similar construct within class declarations, where it would define a class field with a field initializer. Class field initializers are expressions that are evaluated each time a class is instantiated, whereas the expression following `=` in the protocol above is evaluated only once, during the protocol evaluation.
 
-### Specifying and implementing protocols on constructors
+### Interaction with private names
 
-In addition to `Protocol.implement()`, which works for any object, constructors support declaratively implementing protocols on their prototype via the `implements` keyword:
-
-```js
-class C implements Foldable {
-  [Foldable.foldr](f, memo) {
-    // implementation elided
-  }
-}
+A protocol that provides properties with private names which are only available to reference by other protocol members seems clearly useful. But this proposal is still valuable without support for private names. For now, private names in protocols are an early error. Private names in protocols can and should be pursued as a follow-up proposal. This topic is being tracked in [#66](https://github.com/tc39/proposal-first-class-protocols/issues/66).
 
 
-//=> C.prototype[Foldable.toArray] and C.prototype[Foldable.length] are now available
-//=> C.prototype implements Foldable === true
-let c = new C();
-//=> c implements Foldable === true
-```
-
-When protocols are implemented on constructors (via the `class C implements P` syntax), they are installed on the class `.prototype` object, i.e. they are equivalent to `Protocol.implement(C.prototype, P)`.
-
-By implementing `Foldable`, class `C` now gained a `C.prototype[Foldable.toArray]` method and a `C.prototype[Foldable.length]` accessor, which it can choose to expose to the outside world like so:
-
-```js
-class C implements Foldable {
-  [Foldable.foldr](f, memo) {
-    // implementation elided
-  }
-
-  get toArray() {
-    return this[Foldable.toArray];
-  }
-
-  get length() {
-    return this[Foldable.length];
-  }
-}
-```
+## Protocol composition
 
 ### Sub-protocols
 
@@ -304,7 +288,7 @@ class C implements Foldable {
 >[!IMPORTANT]
 > Should `constructor` and `prototype` be _always_ implicitly strings and not create symbols on the protocol object? See issue [#84](https://github.com/tc39/proposal-first-class-protocols/issues/84)
 
-### Protocol composition
+### Inheritance
 
 Once created, protocols are frozen and cannot be modified.
 Instead, inheritance can be used to create new protocols from existing ones.
@@ -330,7 +314,9 @@ class C implements A, B {
 > [!IMPORTANT]
 > See issue [#23](https://github.com/tc39/proposal-first-class-protocols/issues/23) for discussion on the exact implementation and semantics of protocol composition.
 
-### Imperative protocol construction
+## Imperative API
+
+### The `Protocol()` constructor
 
 Protocols can also be constructed imperatively, via the `Protocol()` constructor.
 All options are optional.
@@ -358,7 +344,7 @@ const Foldable = new Protocol({
 > [!IMPORTANT]
 > The exact shape is TBD (see [#82](https://github.com/tc39/proposal-first-class-protocols/issues/82)). One design decision that affects it is whether `"foo"` and `foo` are distinct members (see [#59](https://github.com/tc39/proposal-first-class-protocols/issues/59)).
 
-### Protocol introspection
+### Protocol introspection: `Protocol.describe()`
 
 `Protocol.describe(p)` takes an existing protocol object and returns an object literal that could be passed to the constructor to create a new protocol.
 
@@ -382,19 +368,46 @@ const P = Protocol.describe(Foldable);
 // }
 ```
 
-### Querying protocol membership
 
-An `implements` operator can be used to query protocol membership, by checking whether an object satisfies a protocol's requirements and includes its provided members.
+## Convenience Features
+
+### Specifying and implementing protocols on constructors
+
+In addition to `Protocol.implement()`, which works for any object, constructors support declaratively implementing protocols on their prototype via the `implements` keyword:
 
 ```js
-if (obj implements P) {
-  // reached iff obj has all fields
-  // required by P and all fields
-  // provided by P
+class C implements Foldable {
+  [Foldable.foldr](f, memo) {
+    // implementation elided
+  }
 }
+
+
+//=> C.prototype[Foldable.toArray] and C.prototype[Foldable.length] are now available
+//=> C.prototype implements Foldable === true
+let c = new C();
+//=> c implements Foldable === true
 ```
 
+When protocols are implemented on constructors (via the `class C implements P` syntax), they are installed on the class `.prototype` object, i.e. they are equivalent to `Protocol.implement(C.prototype, P)`.
 
+By implementing `Foldable`, class `C` now gained a `C.prototype[Foldable.toArray]` method and a `C.prototype[Foldable.length]` accessor, which it can choose to expose to the outside world like so:
+
+```js
+class C implements Foldable {
+  [Foldable.foldr](f, memo) {
+    // implementation elided
+  }
+
+  get toArray() {
+    return this[Foldable.toArray];
+  }
+
+  get length() {
+    return this[Foldable.length];
+  }
+}
+```
 
 ### Automatically creating string aliases for all provided members
 
@@ -413,9 +426,6 @@ Some (not necessarily mutually exclusive) ideas include:
 - a `Protocol.implement()` option (e.g. `Protocol.implement(obj, Foldable, { withStrings: true })`)
 - a method that transforms a protocol into another protocol that also provides string aliases for all provided members (e.g. `class C implements Protocol.withStrings(P)`)
 
-### Interaction with private names
-
-A protocol that provides properties with private names which are only available to reference by other protocol members seems clearly useful. But this proposal is still valuable without support for private names. For now, private names in protocols are an early error. Private names in protocols can and should be pursued as a follow-up proposal. This topic is being tracked in [#66](https://github.com/tc39/proposal-first-class-protocols/issues/66).
 
 ## Patterns
 
