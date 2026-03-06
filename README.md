@@ -89,6 +89,8 @@ Protocol.implement(obj, Foldable);
 //=> obj[Foldable.toArray] and obj[Foldable.length] are now available
 ```
 
+If the object already has a property that would be provided by the protocol, it is not replaced.
+
 ## Motivation
 
 The most well-known protocol in ECMAScript is the iteration protocol. APIs such
