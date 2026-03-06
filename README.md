@@ -26,17 +26,21 @@ Champions:
    5. [Protocol introspection](#protocol-introspection)
    6. [Querying protocol membership](#querying-protocol-membership)
    7. [Providing explicit member names](#providing-explicit-member-names)
-   8. [Automatically creating string aliases for all provided members](#automatically-creating-string-aliases-for-all-provided-members)
-4. [How can I play with it?](#how-can-i-play-with-it)
-5. [Relationship to similar features](#relationship-to-similar-features)
+   8. [Providing non-method data properties](#providing-non-method-data-properties)
+   9. [Automatically creating string aliases for all provided members](#automatically-creating-string-aliases-for-all-provided-members)
+   10. [interaction with private names](#interaction-with-private-names)
+4. [Patterns](#patterns)
+   1. [Conflict resolution \& disambiguation](#conflict-resolution--disambiguation)
+5. [How can I play with it?](#how-can-i-play-with-it)
+6. [Relationship to similar features](#relationship-to-similar-features)
    1. [Haskell type classes](#haskell-type-classes)
    2. [Rust traits](#rust-traits)
    3. [Java 8+ interfaces](#java-8-interfaces)
    4. [Ruby mixins](#ruby-mixins)
    5. [ECMAScript `mixin(...)` pattern](#ecmascript-mixin-pattern)
-6. [Links to previous related discussions/strawmen](#links-to-previous-related-discussionsstrawmen)
-7. [History](#history)
-8. [Changelog](#changelog)
+7. [Links to previous related discussions/strawmen](#links-to-previous-related-discussionsstrawmen)
+8. [History](#history)
+9. [Changelog](#changelog)
    1. [Feb 24, 2026](#feb-24-2026)
    2. [From the 2018 update](#from-the-2018-update)
 
@@ -410,6 +414,44 @@ Some (not necessarily mutually exclusive) ideas include:
 ### interaction with private names
 
 A protocol that provides properties with private names which are only available to reference by other protocol members seems clearly useful. But this proposal is still valuable without support for private names. For now, private names in protocols are an early error. Private names in protocols can and should be pursued as a follow-up proposal. This topic is being tracked in [#66](https://github.com/tc39/proposal-first-class-protocols/issues/66).
+
+## Patterns
+
+### Conflict resolution & disambiguation
+
+While protocols are designed to avoid conflicts through the use of symbols, there are cases where conflicts can arise, such as:
+- Explicit string-based member names
+- External symbols
+- When using automatic string aliases
+
+By default, protocols with conflicting members will throw an error.
+
+```js
+protocol A {
+  ["x"] = 1
+}
+
+protocol B {
+  ["x"] = 2
+}
+
+class C implements A, B {}
+//=> Error: Protocol member "x" is defined in multiple protocols: A and B
+```
+
+However, as discussed earlier, properties in the implementing object take precedence over protocol members.
+As a corollary, this also provides a way for the implementing object to disambiguate:
+
+```js
+class C implements A, B {
+  get x() {
+    let Ax = Protocol.describe(A).members.x.value;
+    let Bx = Protocol.describe(B).members.x.value;
+    return Math.max(Ax, Bx);
+  }
+}
+//=> C.prototype.x === 2
+```
 
 ## How can I play with it?
 
