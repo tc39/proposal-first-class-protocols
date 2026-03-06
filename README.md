@@ -19,14 +19,14 @@ Champions:
    1. [Implementing protocols on objects](#implementing-protocols-on-objects)
 2. [Motivation](#motivation)
 3. [Additional Features](#additional-features)
-   1. [Specifying and implementing protocols on constructors](#specifying-and-implementing-protocols-on-constructors)
-   2. [Sub-protocols](#sub-protocols)
-   3. [Protocol composition](#protocol-composition)
-   4. [Imperative protocol construction](#imperative-protocol-construction)
-   5. [Protocol introspection](#protocol-introspection)
-   6. [Querying protocol membership](#querying-protocol-membership)
-   7. [Providing explicit member names](#providing-explicit-member-names)
-   8. [Providing non-method data properties](#providing-non-method-data-properties)
+   1. [Providing explicit member names](#providing-explicit-member-names)
+   2. [Providing non-method data properties](#providing-non-method-data-properties)
+   3. [Specifying and implementing protocols on constructors](#specifying-and-implementing-protocols-on-constructors)
+   4. [Sub-protocols](#sub-protocols)
+   5. [Protocol composition](#protocol-composition)
+   6. [Imperative protocol construction](#imperative-protocol-construction)
+   7. [Protocol introspection](#protocol-introspection)
+   8. [Querying protocol membership](#querying-protocol-membership)
    9. [Automatically creating string aliases for all provided members](#automatically-creating-string-aliases-for-all-provided-members)
    10. [Interaction with private names](#interaction-with-private-names)
 4. [Patterns](#patterns)
@@ -178,6 +178,55 @@ Protocol.implement(String.prototype, Ordered);
 ```
 
 ## Additional Features
+
+### Providing explicit member names
+
+By default, both provided and required member names actually define symbols on the protocol object, which is a key part of how protocols avoid conflicts.
+It is possible to provide an explicit member name that will be used verbatim, by using [_ComputedPropertyName_](https://tc39.es/ecma262/#prod-ComputedPropertyName) syntax:
+
+```js
+protocol P {
+  requires ["a"];
+  b(){ print('b'); }
+}
+
+class C implements P {
+  a() {}
+}
+
+C.prototype implements P; // true
+(new C)[P.b](); // prints 'b'
+```
+
+This makes it possible to describe protocols already in the language which is necessary per committee feedback.
+This includes protocols whose required members are strings, such as [thenables](examples/thenable.js),
+as well as protocols whose required members are existing symbols, such as the [iteration protocol](examples/iterable.js):
+
+```js
+protocol Iterable {
+  requires [Symbol.iterator];
+
+  forEach(f) {
+    for (let entry of this) {
+      f.call(this, entry);
+    }
+  }
+
+  // ...
+}
+```
+
+### Providing non-method data properties
+
+As seen throughout the rest of this explainer, protocols may provide methods and accessors using the same notation used within class declarations. In addition to those, protocols may provide data properties with any value using the following notation:
+
+```js
+protocol P {
+  x = 0
+}
+```
+
+In the above example, protocol `P` provides a member named `x` with value `0`. This differs from the meaning of the similar construct within class declarations, where it would define a class field with a field initializer. Class field initializers are expressions that are evaluated each time a class is instantiated, whereas the expression following `=` in the protocol above is evaluated only once, during the protocol evaluation.
 
 ### Specifying and implementing protocols on constructors
 
@@ -345,54 +394,7 @@ if (obj implements P) {
 }
 ```
 
-### Providing explicit member names
 
-By default, both provided and required member names actually define symbols on the protocol object, which is a key part of how protocols avoid conflicts.
-It is possible to provide an explicit member name that will be used verbatim, by using [_ComputedPropertyName_](https://tc39.es/ecma262/#prod-ComputedPropertyName) syntax:
-
-```js
-protocol P {
-  requires ["a"];
-  b(){ print('b'); }
-}
-
-class C implements P {
-  a() {}
-}
-
-C.prototype implements P; // true
-(new C)[P.b](); // prints 'b'
-```
-
-This makes it possible to describe protocols already in the language which is necessary per committee feedback.
-This includes protocols whose required members are strings, such as [thenables](examples/thenable.js),
-as well as protocols whose required members are existing symbols, such as the [iteration protocol](examples/iterable.js):
-
-```js
-protocol Iterable {
-  requires [Symbol.iterator];
-
-  forEach(f) {
-    for (let entry of this) {
-      f.call(this, entry);
-    }
-  }
-
-  // ...
-}
-```
-
-### Providing non-method data properties
-
-As seen throughout the rest of this explainer, protocols may provide methods and accessors using the same notation used within class declarations. In addition to those, protocols may provide data properties with any value using the following notation:
-
-```js
-protocol P {
-  x = 0
-}
-```
-
-In the above example, protocol `P` provides a member named `x` with value `0`. This differs from the meaning of the similar construct within class declarations, where it would define a class field with a field initializer. Class field initializers are expressions that are evaluated each time a class is instantiated, whereas the expression following `=` in the protocol above is evaluated only once, during the protocol evaluation.
 
 ### Automatically creating string aliases for all provided members
 
