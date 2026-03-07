@@ -11,9 +11,10 @@
 
 ## Today
 
-- Present changes since 2018 and current status
-- Present hairy design challenges
-- Receive feedback from the committee
+- reminders: getting back up to speed with the proposal
+- changes since 2018 and current status
+- unresolved design challenges
+- open discussion and committee feedback
 
 ## Motivation
 
@@ -27,16 +28,25 @@
 
 ## Motivation continued: real-world use cases
 
-- existing built-in protocols (both symbol-based and string-based)
+- reify existing built-in protocols (both symbol-based and string-based)
   - iteration
   - generator
   - to string (`toString`) and Object.prototype.toString (`toStringTag`)
   - to primitive (`valueOf`)
   - to JSON (`toJSON`)
+  - thenables
   - concat spreadable
   - unscopeable
+  - regular expression stuff
+  - species 😱
   - ...
-- mathematical properties of structures
+- new built-in protocols:
+  - mathematical properties of structures
+    - algebraic structures: groups, lattices, rings, algebras, etc
+    - catgory theoretic structures
+  - Ord, Eq, PartialEq, FromIterator, etc.
+  - Symbol-based alternatives of existing string-based protocols
+  - implementations of these for JS built-ins
 - web components
 
 ## Brief High-level Overview of Design circa 2018
