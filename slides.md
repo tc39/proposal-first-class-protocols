@@ -15,12 +15,37 @@
 - Present hairy design challenges
 - Receive feedback from the committee
 
-## What hasn't changed
+## Motivation
 
-TBD
+- describe well-known interfaces
+- encourage Symbol-based interfaces
+- don't require coordination between producer and consumer
+- don't require coordination across multiple producers
+- all the fun and convenience of monkey-patching built-ins, none of the downsides
+- gives us a standard way to model and refer to existing built-in protocols like iteration
+- more principled duck typing
 
+## Motivation continued: real-world use cases
 
+- existing built-in protocols (both symbol-based and string-based)
+  - iteration
+  - generator
+  - to string (`toString`) and Object.prototype.toString (`toStringTag`)
+  - to primitive (`valueOf`)
+  - to JSON (`toJSON`)
+  - concat spreadable
+  - unscopeable
+  - ...
+- mathematical properties of structures
+- web components
+
+## Brief High-level Overview of Design circa 2018
+
+- protocol declarations/expressions
+- distinct required/provided members
+- `Protocol.implement`
 - `implements` operator
+- integration with class heads
 - ...
 
 ## What has changed
@@ -59,7 +84,7 @@ TBD
 - `Protocol.describe(P)` + `new Protocol()` can be used to create new protocols based on existing ones
 - Object literal shape TBD
 
-## Hairy design challenges
+## Remaining Design Work
 
 ### Are `"foo"` and `foo` distinct members?
 
