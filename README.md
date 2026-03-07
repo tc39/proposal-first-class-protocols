@@ -462,8 +462,61 @@ Protocol.implement(C.prototype, Protocol.union(P, Q));
 While symbol-based names are the default (and desirable for avoiding conflicts), many use cases require integration with implementors of existing ad hoc protocols that are defined in terms of regular string-named properties.
 By default, the implementing object needs to define mappings between the symbol-based names the protocol defines and the string-based names it wants to expose, which can be tedious.
 
+For example, the web platform supports making custom elements form-associated which is currently implemented as a delegation pattern over an `ElementInternals` object.
+If protocols existed, one could imagine a protocol like this provided by the browser:
+
+```js
+protocol FormAssociated {
+  requires formValue;
+
+  get form() { /* elided */ }
+  get labels() { /* elided */ }
+  get validationMessage() { /* elided */ }
+  get validity() { /* elided */ }
+  get willValidate() { /* elided */ }
+  checkValidity() { /* elided */ }
+  reportValidity() { /* elided */ }
+  setCustomValidity(message) { /* elided */ }
+  setValidity(validity) { /* elided */ }
+  // ...
+}
+```
+
+And then used like this:
+
+```js
+class MySlider implements FormAssociated {
+  get [FormAssociated.formValue]() {
+    return this.value;
+  }
+  set [FormAssociated.formValue](value) {
+    this.value = value;
+  }
+}
+```
+
+However, usually implementations will want to expose all the provided members, in order to be consistent with built-in elements.
+This involves *a lot* of boilerplate:
+
+```js
+class MySlider implements FormAssociated {
+  get [FormAssociated.formValue]() { /* elided */ }
+  set [FormAssociated.formValue](value) { /* elided */ }
+
+  get labels () { return this[FormAssociated.labels]; }
+  get validationMessage () { return this[FormAssociated.validationMessage]; }
+  get validity () { return this[FormAssociated.validity]; }
+  get willValidate () { return this[FormAssociated.willValidate]; }
+  get checkValidity () { return this[FormAssociated.checkValidity]; }
+  get reportValidity () { return this[FormAssociated.reportValidity]; }
+  get setCustomValidity () { return this[FormAssociated.setCustomValidity]; }
+  get setValidity () { return this[FormAssociated.setValidity]; }
+  // ...
+}
+```
+
 While protocols *could* define all their provided members as string-named properties, this moves control from the object to the protocol, which is not always desirable.
-In some cases protocols are implemented to add functionality that primarily meant to be used internally, while in other cases they are meant to also add API that exposes this functionality to consumers of the object.
+In some cases protocols are implemented to add functionality that is primarily meant to be used internally, while in other cases they are meant to also add API that exposes this functionality to consumers.
 
 To allow for object authors to make that call, protocol syntax supports a convenience syntax that automatically creates string aliases for all provided members as accessors on the implementing object.
 
