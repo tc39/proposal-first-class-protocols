@@ -98,37 +98,106 @@
 
 ### Are `"foo"` and `foo` distinct members?
 
-TBD
+```js
+protocol P {
+	foo() {}
+	["foo"]() {}
+}
 
-### How does inheritance work?
+Protocol.describe(P);
+// => {
+//   foo: ???
+// }
+```
 
-TBD
+- Object literal shape needs to work as both `Protocol.describe()` output and `new Protocol()` input
+- `foo` and `["foo"]` are technically distinct: `foo` creates a `P.foo` symbol, `["foo"]` is a literal string
+- But that complicates the object literal shape
+- If we disallow both on the same protocol, we can use a simple object literal
 
-### Do sub-protocols create symbols on the parent?
+### How does inheritance work? ([#23](https://github.com/tc39/proposal-first-class-protocols/issues/23))
 
-TBD
+- `extends`, `implements`, both?
+- Does `extends` use the prototype chain?
+- How are parent symbols accessed?
 
-### Should `constructor` and `prototype` be equivalent to `["constructor"]` and `["prototype"]`?
+```js
+protocol P {
+	requires foo() {}
+}
+protocol Q extends P {
+	requires bar() {}
+}
+class C extends Q {
+	[Q.bar]() {}
+	// [Q.foo] or [P.foo]?
+}
+```
+
+### Do sub-protocols create symbols on the parent? ([#81](https://github.com/tc39/proposal-first-class-protocols/issues/81))
+
+```js
+protocol P {
+	requires constructor implements protocol {
+		// Does this create a P.foo?
+		requires foo;
+	}
+}
+```
+
+`Protocol.describe(P).members.constructor.implements.foo` is *extremely* unwieldy. But if they do, then what about:
+
+```js
+protocol P {
+	requires foo;
+
+	requires constructor implements protocol {
+		requires foo;
+	}
+}
+```
+
+```js
+protocol P {
+	requires foo implements Q;
+}
+```
+
+### Should `constructor` and `prototype` be equivalent to `["constructor"]` and `["prototype"]`? ([#84](https://github.com/tc39/proposal-first-class-protocols/issues/84))
 
 - We don’t want `P.constructor` and `P.prototype` symbols
 - Frequently needed: now the only way to provide/require static members
 - Why create an error condition when we can just handle it?
 - But would that complicate the mental model too much?
 
+### What does `super.prop` resolve to, if anything? ([#88](https://github.com/tc39/proposal-first-class-protocols/issues/88))
+
+1. Parent protocol? (if we do `extends`)
+2. `Object.getPrototypeOf(this).foo`? Infinite loop in common cases!
+3. Something more elaborate?
+
+```js
+let superBase = Object.getPrototypeOf(this);
+while (superBase[propertyKey] === protocolMember) {
+  superBase = Object.getPrototypeOf(superBase);
+}
+return superBase[propertyKey];
+```
+
+Resolves as expected in most cases, but possibly too weird?
+
 ### Precedence
 
-- Implementing object overrides protocol members
+- Implementing object overrides protocol members ✅
 - But how do we resolve protocol vs base class?
 
 ```js
 class C {
 	foo() {}
 }
-
 protocol P {
-	foo() {}
+	["foo"]() {}
 }
-
 class D extends C implements P {
 	// Which foo()?
 }
