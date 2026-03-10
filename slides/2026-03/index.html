@@ -199,7 +199,7 @@ protocol P {
 </section>
 <section>
 
-### After
+### Now
 
 ```js
 protocol P {
@@ -243,7 +243,7 @@ protocol P {
 </section>
 <section>
 
-### After
+### Now
 
 ```js
 protocol P {
@@ -288,7 +288,7 @@ C implements P; // true
 </section>
 <section>
 
-### After
+### Now
 
 ```js
 protocol P {
@@ -328,19 +328,39 @@ C implements P; // true
 ## Protocol composition
 
 - Protocol inheritance (`extends`) — but specifics are TBD
-- Removed: `static` members
-- Added: Sub-protocols
-- `Protocol.union` / variadic `Protocol.implement` / `new Protocol({ extends: [...], })`
+- `implements` for multiple inheritance?
+- Sub-protocols
+- `Protocol.union()` (needed to implement variadic `implements` syntax)
+
+</article>
+
+<article class="slide md columns">
+
+## Protocol introspection
+
+```js
+protocol P {
+	foo () {
+		// elided
+	}
+}
+```
+
+- Before: No way to access a protocol's members.
+- `P.foo` is a symbol. How to access the function?
+- How to disambiguate??
+- Now: `Protocol.describe(P)` returns an object literal with the same syntax as the object passed to `new Protocol()`
+- Object literal shape TBD
 
 </article>
 
 <article class="slide md">
 
-## Immutability & introspection
+## Immutability
 
-- Protocols are immutable
+- Before: Undefined whether protocols are mutable or immutable
+- Now: Protocols are immutable
 - `Protocol.describe(P)` + `new Protocol()` can be used to create new protocols based on existing ones
-- Object literal shape TBD
 
 </article>
 
@@ -351,7 +371,7 @@ C implements P; // true
 
 <article class="slide md">
 
-## Remaining Design Work: Open questions
+## Open questions
 
 - Are `"foo"` and `foo` distinct members?
 - How does inheritance work?
