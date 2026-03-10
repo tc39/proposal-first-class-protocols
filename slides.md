@@ -68,8 +68,6 @@ protocol Foldable {
   get length() {
     return this[Foldable.foldr](m => m + 1, 0);
   }
-
-  static from () { /* elided */ }
 }
 ```
 
