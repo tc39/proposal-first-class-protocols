@@ -20,21 +20,20 @@
 
 - Describe well-known interfaces
 - Encourage Symbol-based interfaces
-- Don't require coordination between producer and consumer
-- Don't require coordination across multiple producers
-- All the fun and convenience of monkey-patching built-ins, none of the downsides
+- No coordination needed (between producers and consumers, or across multiple producers)
+- All the fun and convenience of monkey-patching built-ins, none of the downsides!
 - Gives us a standard way to model and refer to existing built-in protocols like iteration
 - More principled duck typing
 
 ## Motivation continued: real-world use cases
 
 - Reify existing built-in protocols (both symbol-based and string-based)
-  - iteration
-  - generator
-  - to string (`toString`) and Object.prototype.toString (`toStringTag`)
-  - to primitive (`valueOf`)
+  - Iteration
+  - Generators
+  - to string (`toString`) and `Object.prototype.toString()` (`toStringTag`)
+  - to primitive (`valueOf`, `Symbol.toPrimitive`)
   - to JSON (`toJSON`)
-  - thenables
+  - Thenables
   - concat spreadable
   - unscopeable
   - regular expression stuff
@@ -42,30 +41,78 @@
   - ...
 
 - New built-in protocols:
-  - mathematical properties of structures
+  - Mathematical properties of structures
     - algebraic structures: groups, lattices, rings, algebras, etc.
     - category theoretic structures
   - Ord, Eq, PartialEq, FromIterator, etc.
   - Symbol-based alternatives of existing string-based protocols
-  - implementations of these for JS built-ins
+  - Implementations of these for JS built-ins
   - New protocols for operator overloading?!
 
-- Web components
-  - FormAssociated, WithStyles, WithStates, etc.
+- Web Components
+  - Focusable, Labelable, SubmitButtonLike, FormAssociated, WithStyles, WithStates, etc.
 
-## Brief High-level Overview of Design circa 2018
+## Brief High-level Overview of [design c. 2018](https://github.com/tc39/proposal-first-class-protocols/blob/2eb25b2913888f06685f392244212121e618ed14/README.md)
+
+```js
+protocol Foldable {
+  // No value = required member
+  // Looks like a string, actually a symbol
+  foldr;
+
+  // provided members
+  toArray() {
+    return this[Foldable.foldr]((m, a) => [a].concat(m), []);
+  }
+  get length() {
+    return this[Foldable.foldr](m => m + 1, 0);
+  }
+
+  static from () { /* elided */ }
+}
+```
+
+Implemented via:
+
+```js
+class C implements Foldable {
+  [Foldable.foldr](f, memo) {
+    // implementation elided
+  }
+}
+```
+
+or
+
+```js
+class C {
+	implements Foldable {
+		foldr(f, memo) {
+			// implementation elided
+		}
+	}
+}
+```
+
+or
+
+```js
+Protocol.implement(C, Foldable);
+```
 
 - Protocol declarations/expressions
+- Declare as identifiers, implemented as symbols
 - Distinct required/provided members
-- `Protocol.implement()`
 - `implements` operator
+- `new Protocol({ ... })` constructor
 - Integration with class heads
 - Inline, grouped implementations in protocol/class bodies
-- `new Protocol({ ... })` constructor
+- `Protocol.implement(Constructor, P)`
+
 
 ## What has changed
 
-### Framing *objects*, not *constructors*
+### Framing around *objects*, not *constructors*
 
 - We want to be able to check `implements P` on both constructors and *instances*!
 - Dropped `static` in favor of sub-protocols
@@ -114,7 +161,7 @@ protocol P {
 
 Protocol.describe(P);
 // => {
-//   foo: ???
+//   foo: { value: function }
 // }
 ```
 
