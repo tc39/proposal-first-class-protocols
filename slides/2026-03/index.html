@@ -67,6 +67,7 @@
 - to JSON (`toJSON`)
 - Thenables, concat spreadable, unscopeable
 - regular expression stuff, species 😱, ...
+- SetLike, MapLike, ArrayLike, etc.
 
 </article>
 
@@ -83,19 +84,18 @@
 - Implementations of these for JS built-ins
 - New protocols for operator overloading?!
 
-- Web Components
-  - Focusable, Labelable, SubmitButtonLike, FormAssociated, WithStyles, WithStates, etc.
-
 </article>
 
 <article class="slide md">
 
 ### Motivation continued: real-world use cases
-## Web Components
+## DOM
 
-<!-- - Today: one huge `ElementInternals` delegate object + repetitive boilerplate -->
-- Integrate native capabilities: Focusable, Labelable, FormAssociated
-- Improve DX of common patterns: WithStyles, WithStates
+- `EventTarget` could have been a protocol!
+- Web Components
+  - Integrate native capabilities: Focusable, Labelable, FormAssociated, etc
+  - Expose WC-specific capabilities: WithStates, etc.
+  - Improve DX of common patterns: [WithStyles](https://lit.dev/docs/components/styles/), WithTemplate, etc
 
 </article>
 
