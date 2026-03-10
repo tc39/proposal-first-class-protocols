@@ -1,0 +1,12 @@
+.columns {
+	display: grid;
+	grid-template-columns: repeat(var(--columns, 2), 1fr);
+	gap: 0 2rem;
+
+	/* First heading */
+	> :is(h1, h2, h3, h4, h5, h6),
+	> p,
+	> .full-width {
+		grid-column: 1 / -1;
+	}
+}

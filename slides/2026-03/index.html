@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Control Over Image Animation</title>
+	<link rel="shortcut icon" href="https://webplatform.design/assets/logo.svg">
+	<script src="talk.js" type="module"></script>
+	<link rel="stylesheet" href="talk.css">
+</head>
+<body data-markdown-elements=".md, details.notes, .md-children > :not(.no-md)" class="language-javascript">
+
+<header class="slide" id="cover">
+	<h1>First-class protocols</h1>
+	<h2>Update on current status and design challenges</h2>
+
+	<footer>Lea Verou, Michael Ficarra, Jordan Harband</footer>
+</header>
+
+<article class="slide md">
+
+## History
+
+- **2017**: Original design by Michael Ficarra
+- **2017**: Stage 1
+- **2018**: Update
+- **2019-2024**: 🦗🦗🦗
+- **Nov 2025**: Renewed interest
+- **Jan 2026**: New co-champions: Lea Verou, Jordan Harband
+- **Mar 2026**: Big update!
+
+</article>
+
+<article class="slide md">
+
+## Today
+
+- Reminders: getting back up to speed with the proposal
+- Changes since 2018 and current status
+- Unresolved design challenges
+- Open discussion and committee feedback
+
+</article>
+
+<article class="slide md">
+
+## Motivation
+
+- Describe well-known interfaces
+- Encourage Symbol-based interfaces
+- No coordination needed (between producers and consumers, or across multiple producers)
+- All the fun and convenience of monkey-patching built-ins, none of the downsides!
+- Gives us a standard way to model and refer to existing built-in protocols like iteration
+- More principled duck typing
+
+</article>
+
+<article class="slide md">
+
+### Motivation continued: real-world use cases
+## Reify existing built-in protocols
+
+- Both symbol-based and string-based
+- Iteration, Generators
+- to string (`toString`) and `Object.prototype.toString()` (`toStringTag`)
+- to primitive (`valueOf`, `Symbol.toPrimitive`)
+- to JSON (`toJSON`)
+- Thenables, concat spreadable, unscopeable
+- regular expression stuff, species 😱, ...
+
+</article>
+
+<article class="slide md">
+
+### Motivation continued: real-world use cases
+## New built-in protocols
+
+- Mathematical properties of structures
+- algebraic structures: groups, lattices, rings, algebras, etc.
+- category theoretic structures
+- Ord, Eq, PartialEq, FromIterator, etc.
+- Symbol-based alternatives of existing string-based protocols
+- Implementations of these for JS built-ins
+- New protocols for operator overloading?!
+
+- Web Components
+  - Focusable, Labelable, SubmitButtonLike, FormAssociated, WithStyles, WithStates, etc.
+
+</article>
+
+<article class="slide md">
+
+### Motivation continued: real-world use cases
+## Web Components
+
+<!-- - Today: one huge `ElementInternals` delegate object + repetitive boilerplate -->
+- Integrate native capabilities: Focusable, Labelable, FormAssociated
+- Improve DX of common patterns: WithStyles, WithStates
+
+</article>
+
+<article class="slide md columns dont-resize" id="c2018">
+
+## [Design circa 2018](https://github.com/tc39/proposal-first-class-protocols/blob/2eb25b2913888f06685f392244212121e618ed14/README.md)
+
+<section>
+### Declaring a protocol
+
+```js
+protocol Foldable {
+  // No value = required member
+  // Looks like a string, actually a symbol
+  foldr;
+
+  // provided members
+  toArray() {
+    return this[Foldable.foldr]((m, a) => [a].concat(m), []);
+  }
+  get length() {
+    return this[Foldable.foldr](m => m + 1, 0);
+  }
+}
+```
+
+</section>
+<section>
+
+### Implementing a protocol
+
+```js
+class C implements Foldable {
+  [Foldable.foldr](f, memo) {
+    // elided
+  }
+}
+```
+
+```js
+class C {
+	implements Foldable {
+		foldr(f, memo) {
+			// elided
+		}
+	}
+}
+```
+
+```js
+C.prototype[Foldable.foldr] = function(f, memo){
+	// elided
+}
+Protocol.implement(C, Foldable);
+```
+</section>
+
+</article>
+
+<article class="slide md">
+
+## Design c. 2018: Summary
+
+- Protocol declarations/expressions
+- Declare as identifiers, implemented as symbols
+- Distinct required/provided members
+- `implements` operator
+- `new Protocol({ ... })` constructor
+- Integration with class heads
+- Inline, grouped implementations in protocol/class bodies
+- `Protocol.implement(Constructor, P)`
+
+</article>
+
+<section>
+
+<header class="slide">
+	<h2>What has changed</h2>
+</header>
+
+<article class="slide md">
+
+## Framing around *objects*, not *constructors*
+
+- We want to be able to check `implements P` on both constructors and *instances*!
+- Dropped `static` in favor of sub-protocols
+- Class syntax (`class C implements P`) is now just sugar for `Protocol.implement(C.prototype, P)`
+
+</article>
+
+<article class="slide md">
+
+## Declaring a protocol
+
+- Previously: bare property names were required, method & accessor ClassElements were provided
+- Now: `requires` context-dependent keyword, everything else is provided
+- Now: Data properties can also be provided
+
+- Unchanged: bare property names generate symbols
+- Previously: Strings were literal, no way to require or provide external symbols
+- Now: ComputedPropertyName syntax for providing explicit member names, whether strings or symbols
+- Unknown: string-named properties: ban? same as bare?
+
+</article>
+
+<article class="slide md">
+
+## Implementing a protocol
+
+- `Protocol.implement(obj, P)`
+- `class C implements P { /* ... */ }` (on `C.prototype`)
+- Dropped: Inline implementations for existing classes (`implemented by`)
+- Dropped: New ClassElement for declaring protocol implementation (`implements protocol P { /* ... */ }`)
+
+</article>
+
+<article class="slide md">
+
+## Protocol composition
+
+- Protocol inheritance (`extends`) — but specifics are TBD
+- Removed: `static` members
+- Added: Sub-protocols
+- `Protocol.union` / variadic `Protocol.implement` / `new Protocol({ extends: [...], })`
+
+</article>
+
+<article class="slide md">
+
+## Immutability & introspection
+
+- Protocols are immutable
+- `Protocol.describe(P)` + `new Protocol()` can be used to create new protocols based on existing ones
+- Object literal shape TBD
+
+</article>
+
+</section>
+
+<section>
+<header class="slide"><h2>Remaining Design Work</h2></header>
+
+<article class="slide md">
+
+## Remaining Design Work: Open questions
+
+- Are `"foo"` and `foo` distinct members?
+- How does inheritance work?
+- How are parent symbols accessed?
+- Do sub-protocols create symbols on the parent?
+- Should `constructor` and `prototype` be equivalent to `["constructor"]` and `["prototype"]`?
+- What does `super.prop` resolve to, if anything?
+- Auto-generated string aliases — how?
+
+</article>
+
+<article class="slide md columns">
+
+## Are `"foo"` and `foo` distinct members? ([#59](https://github.com/tc39/proposal-first-class-protocols/issues/59))
+
+```js
+protocol P {
+	foo() {}
+	["foo"]() {}
+}
+
+Protocol.describe(P);
+// => {
+//   foo: { value: function }
+// }
+```
+
+- Object literal shape needs to work as both `Protocol.describe()` output and `new Protocol()` input
+- `foo` and `["foo"]` are technically distinct: `foo` creates a `P.foo` symbol, `["foo"]` is a literal string
+- But that complicates the object literal shape
+- If we disallow both on the same protocol, we can use a simple object literal
+
+</article>
+
+<article class="slide md columns">
+
+## How does inheritance work? ([#23](https://github.com/tc39/proposal-first-class-protocols/issues/23))
+
+- `extends`, `implements`, both?
+- Does `extends` use the prototype chain?
+- How are parent symbols accessed?
+
+```js
+protocol P {
+	requires foo() {}
+}
+protocol Q extends P {
+	requires bar() {}
+}
+class C implements Q {
+	[Q.bar]() {}
+	// [Q.foo] or [P.foo]?
+}
+```
+
+</article>
+
+<article class="slide md columns">
+
+## Do sub-protocols create symbols on the parent? ([#81](https://github.com/tc39/proposal-first-class-protocols/issues/81))
+
+<div>
+
+```js
+protocol P {
+	requires constructor implements protocol {
+		// Does this create a P.foo?
+		requires foo;
+	}
+}
+```
+
+Problem:
+`Protocol.describe(P).members.constructor.implements.foo` is *extremely* unwieldy.
+
+</div>
+
+<div>
+
+But if sub-protocols do create symbols on the parent, then what about:
+
+```js
+protocol P {
+	requires foo;
+
+	requires constructor implements protocol {
+		requires foo;
+	}
+}
+```
+
+</div>
+
+</article>
+
+<article class="slide md">
+
+## Should `constructor` and `prototype` be automatically strings? ([#84](https://github.com/tc39/proposal-first-class-protocols/issues/84))
+
+- We don't want `P.constructor` and `P.prototype` symbols!
+- Frequently needed: now the only way to provide/require static members
+- Why create an error condition when we can just handle it?
+- But would that complicate the mental model too much?
+
+</article>
+
+<!-- <article class="slide md">
+
+## What does `super.prop` resolve to, if anything? ([#88](https://github.com/tc39/proposal-first-class-protocols/issues/88))
+
+1. Parent protocol? (if we do `extends`)
+2. `Object.getPrototypeOf(this).foo`? Infinite loop in common cases!
+3. Something more elaborate?
+
+```js
+let superBase = Object.getPrototypeOf(this);
+while (superBase[propertyKey] === protocolMember) {
+  superBase = Object.getPrototypeOf(superBase);
+}
+return superBase[propertyKey];
+```
+
+Resolves as expected in most cases, but possibly too weird?
+
+</article> -->
+
+<article class="slide md">
+
+## Auto-generated string aliases ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
+
+- Name/framing?
+- Extension to implementation syntax vs factory
+
+</article>
+
+</section>
+
+</body>
+</html>
