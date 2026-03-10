@@ -2,11 +2,12 @@
 
 ## History
 
+- 2017: Original design by Michael Ficarra
 - 2017: Stage 1
 - 2018: Update
 - 2019-2024: 🦗🦗🦗
 - Nov 2025: Renewed interest
-- Jan 2026: New co-champions
+- Jan 2026: New co-champions: Lea Verou, Jordan Harband
 - Mar 2026: Big update!
 
 ## Today
@@ -150,6 +151,17 @@ Protocol.implement(C, Foldable);
 - Object literal shape TBD
 
 ## Remaining Design Work
+
+### Summary of open questions
+
+- Are `"foo"` and `foo` distinct members?
+- How does inheritance work?
+- How are parent symbols accessed?
+- Do sub-protocols create symbols on the parent?
+- Should `constructor` and `prototype` be equivalent to `["constructor"]` and `["prototype"]`?
+- What does `super.prop` resolve to, if anything?
+- Precedence
+- Auto-generated string aliases — how?
 
 ### Are `"foo"` and `foo` distinct members? ([#59](https://github.com/tc39/proposal-first-class-protocols/issues/59))
 
