@@ -43,24 +43,24 @@
 
 - New built-in protocols:
   - mathematical properties of structures
-    - algebraic structures: groups, lattices, rings, algebras, etc
+    - algebraic structures: groups, lattices, rings, algebras, etc.
     - category theoretic structures
   - Ord, Eq, PartialEq, FromIterator, etc.
   - Symbol-based alternatives of existing string-based protocols
   - implementations of these for JS built-ins
-  - new protocols for operator overloading?!
+  - New protocols for operator overloading?!
 
 - Web components
   - FormAssociated, WithStyles, WithStates, etc.
 
 ## Brief High-level Overview of Design circa 2018
 
-- protocol declarations/expressions
-- distinct required/provided members
+- Protocol declarations/expressions
+- Distinct required/provided members
 - `Protocol.implement()`
 - `implements` operator
-- integration with class heads
-- inline, grouped implementations in protocol/class bodies
+- Integration with class heads
+- Inline, grouped implementations in protocol/class bodies
 - `new Protocol({ ... })` constructor
 
 ## What has changed
@@ -73,7 +73,7 @@
 
 ### Declaring a protocol
 
-- Previously: bare property names are required, method ClassElements are provided
+- Previously: bare property names were required, method & accessor ClassElements were provided
 - Now: `requires` context-dependent keyword, everything else is provided
 - Now: Data properties can also be provided
 
@@ -136,7 +136,7 @@ protocol P {
 protocol Q extends P {
 	requires bar() {}
 }
-class C extends Q {
+class C implements Q {
 	[Q.bar]() {}
 	// [Q.foo] or [P.foo]?
 }
@@ -153,7 +153,7 @@ protocol P {
 }
 ```
 
-`Protocol.describe(P).members.constructor.implements.foo` is *extremely* unwieldy. But if they do, then what about:
+`Protocol.describe(P).members.constructor.implements.foo` is *extremely* unwieldy. But if sub-protocols do create symbols on the parent, then what about:
 
 ```js
 protocol P {
