@@ -37,4 +37,32 @@ h1, h2, h3, h4, h5, h6 {
 	.slide:has(h2) h3 {
 		font-size: calc(1.4 * var(--slide-base-font-size, 1rem));
 	}
+
+	.slide > h2 + h3 {
+		margin: 0;
+	}
+
+
+}
+
+.slide.columns > pre + pre {
+	margin-top: 0;
+}
+
+#with-strings {
+	pre[data-step],
+	pre[data-step-from] {
+		display: none;
+	}
+
+	&[data-step-all$="0"] pre[data-step="0"],
+	&[data-step-all$="1"] pre[data-step="1"],
+	&[data-step-all$="2"] pre[data-step="2"],
+	&[data-step-all$="3"] pre[data-step="3"],
+	&[data-step-all~="0"] pre[data-step-from="0"],
+	&[data-step-all~="1"] pre[data-step-from="1"],
+	&[data-step-all~="2"] pre[data-step-from="2"],
+	&[data-step-all~="3"] pre[data-step-from="3"] {
+		display: block;
+	}
 }

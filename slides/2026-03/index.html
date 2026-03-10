@@ -8,7 +8,7 @@
 	<script src="talk.js" type="module"></script>
 	<link rel="stylesheet" href="talk.css">
 </head>
-<body data-markdown-elements=".md, details.notes, .md-children > :not(.no-md)" class="language-javascript">
+<body data-markdown-elements=".md, details.notes, .md-children > :not(.no-md)" class="language-javascript" data-markdown-plugins="markdown-it-attrs">
 
 <header class="slide" id="cover">
 	<h1>First-class protocols</h1>
@@ -213,6 +213,7 @@ protocol P {
 
 - Now: `requires` context-dependent keyword, everything else is provided
 - Now: Data properties can also be provided
+- TBD: `requires` vs `abstract`?
 
 </section>
 
@@ -498,16 +499,80 @@ Resolves as expected in most cases, but possibly too weird?
 
 </article> -->
 
+<article class="slide md columns" data-steps="3" id="with-strings">
+
+## Auto-generated string aliases ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
+### Motivation
+
+```js
+protocol FormAssociated {
+	requires formValue;
+
+	get form() { /* elided */ }
+	get labels() { /* elided */ }
+	get validationMessage() { /* elided */ }
+	get validity() { /* elided */ }
+	get willValidate() { /* elided */ }
+	checkValidity() { /* elided */ }
+	reportValidity() { /* elided */ }
+	setCustomValidity(message) { /* elided */ }
+	setValidity(validity) { /* elided */ }
+	// ...
+}
+```
+
+```js { data-step="1" }
+class MySlider implements FormAssociated {
+  get [FormAssociated.formValue]() { return this.value; }
+  set [FormAssociated.formValue](value) { this.value = value; }
+}
+```
+```js { data-step-from="2" }
+class MySlider implements FormAssociated {
+  get [FormAssociated.formValue]() { return this.value; }
+  set [FormAssociated.formValue](value) { this.value = value; }
+
+  get labels () { return this[FormAssociated.labels]; }
+  get validationMessage () { return this[FormAssociated.validationMessage]; }
+  get validity () { return this[FormAssociated.validity]; }
+  get willValidate () { return this[FormAssociated.willValidate]; }
+  get checkValidity () { return this[FormAssociated.checkValidity]; }
+  get reportValidity () { return this[FormAssociated.reportValidity]; }
+  get setCustomValidity () { return this[FormAssociated.setCustomValidity]; }
+  get setValidity () { return this[FormAssociated.setValidity]; }
+  // ...
+}
+```
+
+- The protocol _could_ define all provided members as strings, but that moves control from consumer to producer
+- What if it were a property of the _implementation_? But how?
+{ .full-width data-step="3" }
+
+</article>
+
 <article class="slide md">
 
 ## Auto-generated string aliases ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
 
-- Name/framing?
-- Extension to implementation syntax vs factory
+
+- Two directions (concept name TBB, using "with strings" for now):
+  1. Extension to implementation syntax
+   - `Protocol.implement(obj, P, { withStrings: true })`
+   - `class C implements P with strings { /* ... */ }`
+  2. Factory function
+   - `Protocol.implement(obj, Protocol.withStrings(P))`
+   - `class C implements Protocol.withStrings(P) { /* ... */ }`
 
 </article>
 
 </section>
+
+
+<footer class="slide md">
+	## Thank you!
+
+	Let’s continue the conversation at [tc39/proposal-first-class-protocols](https://github.com/tc39/proposal-first-class-protocols)
+</footer>
 
 </body>
 </html>
