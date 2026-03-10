@@ -185,10 +185,10 @@ class C {
 
 ```js
 protocol P {
-	// Just a name = required
+	// Just a name: required
 	foo;
 
-	// Method or accessor = provided
+	// Method or accessor: provided
 	bar () {}
 }
 ```
@@ -205,17 +205,18 @@ protocol P {
 
 ```js
 protocol P {
-	// Explicit required member
+	// Explicit marker for required members
 	requires foo;
 
-	// All else provided
+	// Everything else is provided
 	bar () {}
+	baz = 0
 }
 ```
 
 - `requires` context-dependent keyword
-- TBD: `requires` vs `abstract`?
-- Everything else is provided
+- TBD: `requires`? `abstract`? something else?
+- Methods and accessors are provided
 - Data properties can also be provided
 
 </section>
@@ -353,8 +354,8 @@ protocol P {
 - Before: No way to access a protocol's members.
 - `P.foo` is a symbol. How to access the function?
 - How to disambiguate??
-- Now: `Protocol.describe(P)` returns an object literal with the same syntax as the object passed to `new Protocol()`
-- Object literal shape TBD
+- Now: `Protocol.describe(P)` returns an object with the same syntax as the object passed to `new Protocol(...)`
+- Descriptor object shape TBD
 
 </article>
 
@@ -364,7 +365,7 @@ protocol P {
 
 - Before: Undefined whether protocols are mutable or immutable
 - Now: Protocols are immutable
-- `Protocol.describe(P)` + `new Protocol()` can be used to create new protocols based on existing ones
+- `Protocol.describe(P)` + `new Protocol(...)` can be used to create new protocols based on existing ones
 
 </article>
 
@@ -403,10 +404,10 @@ Protocol.describe(P);
 // }
 ```
 
-- Object literal shape needs to work as both `Protocol.describe()` output and `new Protocol()` input
+- Object shape needs to work as both `Protocol.describe(...)` output and `new Protocol(...)` input
 - `foo` and `["foo"]` are technically distinct: `foo` creates a `P.foo` symbol, `["foo"]` is a literal string
 - But that complicates the object literal shape
-- If we disallow both on the same protocol, we can use a simple object literal
+- If we disallow both on the same protocol, we can use a simple descriptor shape
 
 </article>
 
@@ -449,7 +450,7 @@ protocol P {
 ```
 
 Problem:
-`Protocol.describe(P).members.constructor.implements.foo` is *extremely* unwieldy.
+`Protocol.describe(Protocol.describe(P).members.constructor).members.foo` is *extremely* unwieldy.
 
 </div>
 
