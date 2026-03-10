@@ -328,14 +328,35 @@ C implements P; // true
 
 </article>
 
+<article class="slide md columns">
+
+## Protocol flattening
+
+```js
+protocol P { requires a; b() {} }
+protocol Q { requires [P.b]; c() {} }
+
+class C implements P, Q {
+	[P.a]() { /* ... */ }
+}
+```
+
+- How does variadic `implements` syntax work?
+- `C` should not need to also implement `P.b`!
+- _Flattening_ to the rescue!
+- Flattening: Union of all required and all provided members
+- Expose to authors via `Protocol.union()`
+
+</article>
+
 <article class="slide md">
 
 ## Protocol composition
 
-- Protocol inheritance (`extends`) — but specifics are TBD
-- `implements` for multiple inheritance?
+- Inheritance (specifics are TBD: single? multiple? `extends`? `implements`?)
 - Sub-protocols
 - `Protocol.union()` (needed to implement variadic `implements` syntax)
+- `new Protocol({implements: [P, Q, ...]})`
 
 </article>
 
