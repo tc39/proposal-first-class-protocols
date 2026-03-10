@@ -185,15 +185,18 @@ class C {
 
 ```js
 protocol P {
-	// No value = required member
+	// Just a name = required
 	foo;
 
-	// Provided
+	// Method or accessor = provided
 	bar () {}
 }
 ```
 
-- Bare property names were required, method & accessor ClassElements were provided
+- Bare property names were required
+- Method & accessor ClassElements were provided
+- Not easily extensible to additional constraints
+- Not easily extensible to provided data properties
 
 </section>
 <section>
@@ -210,9 +213,10 @@ protocol P {
 }
 ```
 
-- Now: `requires` context-dependent keyword, everything else is provided
-- Now: Data properties can also be provided
+- `requires` context-dependent keyword
 - TBD: `requires` vs `abstract`?
+- Everything else is provided
+- Data properties can also be provided
 
 </section>
 
