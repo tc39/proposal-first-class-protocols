@@ -6,7 +6,7 @@
 - 2018: Update
 - 2019-2024: 🦗🦗🦗
 - Nov 2025: Renewed interest
-- Jan 2026: New co-champion
+- Jan 2026: New co-champions
 - Mar 2026: Big update!
 
 ## Today
@@ -40,6 +40,7 @@
   - regular expression stuff
   - species 😱
   - ...
+
 - new built-in protocols:
   - mathematical properties of structures
     - algebraic structures: groups, lattices, rings, algebras, etc
@@ -47,7 +48,10 @@
   - Ord, Eq, PartialEq, FromIterator, etc.
   - Symbol-based alternatives of existing string-based protocols
   - implementations of these for JS built-ins
+  - new protocols for operator overloading?!
+
 - web components
+  - TODO: expand
 
 ## Brief High-level Overview of Design circa 2018
 
@@ -56,7 +60,8 @@
 - `Protocol.implement`
 - `implements` operator
 - integration with class heads
-- ...
+- inline, grouped implementations in protocol/class bodies
+- `new Protocol({ ... })` constructor
 
 ## What has changed
 
@@ -68,35 +73,38 @@
 
 ### Declaring a protocol
 
-- Previously: Required vs provided was based on member type
-- Now: Explicit `requires`, all else is provided
+- Previously: bare property names are required, method ClassElements are provided
+- Now: `requires` context-dependent keyword, everything else is provided
 - Now: Data properties can also be provided
 
-- Unchanged: Identifiers generate symbols
+- Unchanged: bare property names generate symbols
 - Previously: Strings were literal, no way to require or provide external symbols
 - Now: ComputedPropertyName syntax for providing explicit member names, whether strings or symbols
+- Unknown: string-named properties: ban? same as bare?
 
 ### Implementing a protocol on an object
 
 - `Protocol.implement(obj, P)`
-- `class C implements P { /* ... */ }`
+- `class C implements P { /* ... */ }` (on `C.prototype`)
 - Dropped: Inline implementations for existing classes  (`implemented by`)
 - Dropped: New ClassElement for declaring protocol implementation (`implements protocol P { /* ... */ }`)
 
 ### Protocol composition
 
 - Protocol inheritance (`extends`) — but specifics are TBD
-- Sub-protocols have replaced `static` members
+- Removed: `static` members
+- Added: Sub-protocols
+- `Protocol.union` / variadic `Protocol.implement` / `new Protocol({ extends: [...], })`
 
 ### Immutability & introspection
 
-- Protocols are now immutable
+- Protocols are immutable
 - `Protocol.describe(P)` + `new Protocol()` can be used to create new protocols based on existing ones
 - Object literal shape TBD
 
 ## Remaining Design Work
 
-### Are `"foo"` and `foo` distinct members?
+### Are `"foo"` and `foo` distinct members? ([#59](https://github.com/tc39/proposal-first-class-protocols/issues/59))
 
 ```js
 protocol P {
@@ -186,7 +194,9 @@ return superBase[propertyKey];
 
 Resolves as expected in most cases, but possibly too weird?
 
-### Precedence
+### Precedence ([#76](https://github.com/tc39/proposal-first-class-protocols/issues/76))
+
+(Note from MF: I don't think we should include this topic)
 
 - Implementing object overrides protocol members ✅
 - But how do we resolve protocol vs base class?
@@ -203,7 +213,7 @@ class D extends C implements P {
 }
 ```
 
-### Auto-generated string aliases
+### Auto-generated string aliases ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
 
 - Name/framing?
 - Extension to implementation syntax vs factory
