@@ -166,7 +166,7 @@ Protocol.implement(C, Foldable);
 - `new Protocol({ ... })` constructor
 - Integration with class heads
 - Inline, grouped implementations in protocol/class bodies
-- `Protocol.implement(Constructor, P)`
+- `Protocol.implement(obj, P)`
 
 </article>
 
@@ -176,28 +176,139 @@ Protocol.implement(C, Foldable);
 	<h2>What has changed</h2>
 </header>
 
-<article class="slide md">
+<article class="slide md columns">
 
-## Framing around *objects*, not *constructors*
+## Explicit required members
 
-- We want to be able to check `implements P` on both constructors and *instances*!
-- Dropped `static` in favor of sub-protocols
-- Class syntax (`class C implements P`) is now just sugar for `Protocol.implement(C.prototype, P)`
+<section>
 
-</article>
+### Before
 
-<article class="slide md">
+```js
+protocol P {
+	// No value = required member
+	foo;
 
-## Declaring a protocol
+	// Provided
+	bar () {}
+}
+```
 
-- Previously: bare property names were required, method & accessor ClassElements were provided
+- Bare property names were required, method & accessor ClassElements were provided
+
+</section>
+<section>
+
+### After
+
+```js
+protocol P {
+	// Explicit required member
+	requires foo;
+
+	// All else provided
+	bar () {}
+}
+```
+
 - Now: `requires` context-dependent keyword, everything else is provided
 - Now: Data properties can also be provided
 
-- Unchanged: bare property names generate symbols
-- Previously: Strings were literal, no way to require or provide external symbols
-- Now: ComputedPropertyName syntax for providing explicit member names, whether strings or symbols
-- Unknown: string-named properties: ban? same as bare?
+</section>
+
+</article>
+
+<article class="slide md columns">
+
+## ComputedPropertyName for literal member names
+
+<section>
+
+### Before
+
+```js
+protocol P {
+	// Added as P.foo
+	foo () {}
+
+	// Added as a literal "bar" property
+	"bar" () {}
+}
+```
+
+- Bare property names generate symbols
+- Quoted strings generate literal strings
+- No way to use external symbols (e.g. `Symbol.iterator`)
+
+</section>
+<section>
+
+### After
+
+```js
+protocol P {
+	// Still added as P.foo
+	foo () {}
+
+	// Added as a literal "bar" property
+	["bar"] () {}
+
+	// Look ma, external symbols!
+	[Symbol.iterator] () {}
+}
+```
+
+</section>
+
+</article>
+
+<article class="slide md columns">
+
+## Framing around *objects*, not *constructors*
+
+<section>
+
+### Before
+
+```js
+protocol P {
+	requires static foo;
+	bar () {}
+}
+class C implements P {}
+C implements P; // true
+(new C) implements P; // false!
+```
+
+- `class C implements P` = `Protocol.implement(C, P)`
+- Direct protocol members added on `C.prototype`, explicit `static` members added directly on `C`
+- Result: cannot implement on plain objects!
+- Result: cannot check on instances!
+
+</section>
+<section>
+
+### After
+
+```js
+protocol P {
+	requires constructor implements protocol {
+		foo() {}
+	}
+	bar () {}
+}
+class C implements P {}
+C implements P; // true
+(new C).bar(); // true
+```
+
+- No special syntax for constructors, all framed around objects
+- `Protocol.implement(obj, P)`: Direct protocol members added on `obj`
+- Sub-protocols for deeper requires/provides
+- Dropped `static` in favor of `constructor` sub-protocols
+- `class C implements P` is now sugar for `Protocol.implement(C.prototype, P)`
+
+</section>
 
 </article>
 
