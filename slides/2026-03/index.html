@@ -108,31 +108,37 @@
 
 ```js
 protocol Foldable {
-  // No value = required member
-  // Looks like a string, actually a symbol
-  foldr;
+	// No value = required member
+	// Looks like a string, actually a symbol
+	foldr;
 
-  // provided members
-  toArray() {
-    return this[Foldable.foldr]((m, a) => [a].concat(m), []);
-  }
-  get length() {
-    return this[Foldable.foldr](m => m + 1, 0);
-  }
+	// provided members
+	toArray() {
+		return this[Foldable.foldr]((m, a) =>
+				[a].concat(m), []);
+	}
+	get length() {
+		return this[Foldable.foldr](m => m + 1, 0);
+	}
 }
 ```
 
 </section>
-<section>
+<section class="delayed-children">
 
 ### Implementing a protocol
 
-```js
+```js { data-step="1" }
 class C implements Foldable {
-  [Foldable.foldr](f, memo) {
-    // elided
-  }
+  [Foldable.foldr](f, memo) { /* ... */ }
 }
+```
+
+```js
+C.prototype[Foldable.foldr] = function(f, memo){
+	// elided
+}
+Protocol.implement(C, Foldable);
 ```
 
 ```js
@@ -143,13 +149,6 @@ class C {
 		}
 	}
 }
-```
-
-```js
-C.prototype[Foldable.foldr] = function(f, memo){
-	// elided
-}
-Protocol.implement(C, Foldable);
 ```
 </section>
 

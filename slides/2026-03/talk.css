@@ -24,7 +24,7 @@ h1, h2, h3, h4, h5, h6 {
 
 	section + section {
 		pre {
-			font-size: 50%;
+			font-size: 60%;
 
 			+ pre {
 				margin-top: 1rem;
@@ -49,7 +49,7 @@ h1, h2, h3, h4, h5, h6 {
 	margin-top: 0;
 }
 
-#with-strings {
+[data-steps] {
 	pre[data-step],
 	pre[data-step-from] {
 		display: none;
