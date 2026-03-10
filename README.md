@@ -12,6 +12,7 @@ Stage: **1**
 Champions:
 - Michael Ficarra (@michaelficarra)
 - Lea Verou (@leaverou)
+- Jordan Harband (@ljharb)
 
 ## Contents
 
