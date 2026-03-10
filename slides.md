@@ -11,24 +11,24 @@
 
 ## Today
 
-- reminders: getting back up to speed with the proposal
-- changes since 2018 and current status
-- unresolved design challenges
-- open discussion and committee feedback
+- Reminders: getting back up to speed with the proposal
+- Changes since 2018 and current status
+- Unresolved design challenges
+- Open discussion and committee feedback
 
 ## Motivation
 
-- describe well-known interfaces
-- encourage Symbol-based interfaces
-- don't require coordination between producer and consumer
-- don't require coordination across multiple producers
-- all the fun and convenience of monkey-patching built-ins, none of the downsides
-- gives us a standard way to model and refer to existing built-in protocols like iteration
-- more principled duck typing
+- Describe well-known interfaces
+- Encourage Symbol-based interfaces
+- Don't require coordination between producer and consumer
+- Don't require coordination across multiple producers
+- All the fun and convenience of monkey-patching built-ins, none of the downsides
+- Gives us a standard way to model and refer to existing built-in protocols like iteration
+- More principled duck typing
 
 ## Motivation continued: real-world use cases
 
-- reify existing built-in protocols (both symbol-based and string-based)
+- Reify existing built-in protocols (both symbol-based and string-based)
   - iteration
   - generator
   - to string (`toString`) and Object.prototype.toString (`toStringTag`)
@@ -41,23 +41,23 @@
   - species 😱
   - ...
 
-- new built-in protocols:
+- New built-in protocols:
   - mathematical properties of structures
     - algebraic structures: groups, lattices, rings, algebras, etc
-    - catgory theoretic structures
+    - category theoretic structures
   - Ord, Eq, PartialEq, FromIterator, etc.
   - Symbol-based alternatives of existing string-based protocols
   - implementations of these for JS built-ins
   - new protocols for operator overloading?!
 
-- web components
-  - TODO: expand
+- Web components
+  - FormAssociated, WithStyles, WithStates, etc.
 
 ## Brief High-level Overview of Design circa 2018
 
 - protocol declarations/expressions
 - distinct required/provided members
-- `Protocol.implement`
+- `Protocol.implement()`
 - `implements` operator
 - integration with class heads
 - inline, grouped implementations in protocol/class bodies
@@ -86,7 +86,7 @@
 
 - `Protocol.implement(obj, P)`
 - `class C implements P { /* ... */ }` (on `C.prototype`)
-- Dropped: Inline implementations for existing classes  (`implemented by`)
+- Dropped: Inline implementations for existing classes (`implemented by`)
 - Dropped: New ClassElement for declaring protocol implementation (`implements protocol P { /* ... */ }`)
 
 ### Protocol composition
