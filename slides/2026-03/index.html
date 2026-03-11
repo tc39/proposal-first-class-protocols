@@ -311,7 +311,7 @@ C implements P; // true
 - No special syntax for constructors, all framed around objects
 - `Protocol.implement(obj, P)`: Direct protocol members added on `obj`
 - Sub-protocols for deeper requires/provides
-- Dropped `static` in favor of `constructor` sub-protocols
+- Dropped `static` in favor of `constructor`/`prototype` sub-protocols
 - `class C implements P` is now sugar for `Protocol.implement(C.prototype, P)`
 
 </section>
@@ -382,8 +382,7 @@ protocol P {
 
 <article class="slide md columns" id="with-strings">
 
-## Auto-generated string aliases ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
-### Motivation
+## Reducing boilerplate ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
 
 ```js
 protocol FormAssociated {
@@ -447,7 +446,6 @@ class C implements Protocol.withStrings(P) { /* ... */ }
 - Name TBB (help?)
 - Takes a protocol and returns a new protocol that includes string accessors for all provided members
 - **Memoized**: same input protocol → same output protocol
-- Later we could even add options to customize mappings
 
 </article>
 
@@ -461,10 +459,10 @@ class C implements Protocol.withStrings(P) { /* ... */ }
 ## Open questions
 
 - Are `"foo"` and `foo` distinct members?
+- Should `constructor` and `prototype` be automatically strings?
 - Inheritance: `extends`, `implements`, both?
 - How are parent symbols accessed?
-- Do sub-protocols create symbols on the parent?
-- Should `constructor` and `prototype` be automatically strings?
+- How are sub-protocol symbols accessed?
 
 </article>
 
