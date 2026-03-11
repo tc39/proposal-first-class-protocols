@@ -349,17 +349,6 @@ class C implements P, Q {
 
 </article>
 
-<article class="slide md">
-
-## Protocol composition
-
-- Inheritance (specifics are TBD: single? multiple? `extends`? `implements`?)
-- Sub-protocols
-- `Protocol.union()` (needed to implement variadic `implements` syntax)
-- `new Protocol({implements: [P, Q, ...]})`
-
-</article>
-
 <article class="slide md columns">
 
 ## Protocol introspection
@@ -432,18 +421,25 @@ Protocol.describe(P);
 
 </article>
 
-<article class="slide md columns">
+<article class="slide md">
 
-## How does inheritance work? ([#23](https://github.com/tc39/proposal-first-class-protocols/issues/23))
+## Protocol composition
 
 - `extends`, `implements`, both?
-- Does `extends` use the prototype chain?
-- How are parent symbols accessed?
+- If `extends`, does it use the prototype chain?
+- If `extends`, does it support one or multiple parent protocols?
+
+</article>
+
+<article class="slide md">
+
+## How are parent symbols accessed? ([#23](https://github.com/tc39/proposal-first-class-protocols/issues/23))
 
 ```js
 protocol P {
 	requires foo() {}
 }
+// Or implements P
 protocol Q extends P {
 	requires bar() {}
 }
