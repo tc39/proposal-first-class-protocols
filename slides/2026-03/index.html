@@ -99,14 +99,14 @@
 <article class="slide md">
 
 ## Real-world use cases
-### DOM
+### DOM & Web Components
 
 - `EventTarget` could have been a protocol!
+- `HTMLMediaElement` could have been a set of protocols (WithControls, SupportsPlayback etc.)
+- Element capabilities: Focusable, Labelable, PopoverTarget, FormAssociated, etc
 - Web Components
-  - `ElementInternals` could have been multiple protocols
-  - Integrate native capabilities: Focusable, Labelable, FormAssociated, etc
-  - Expose WC-specific capabilities: WithStates, etc.
-  - Improve DX of common patterns: [WithStyles](https://lit.dev/docs/components/styles/), WithTemplate, etc
+  - `ElementInternals` could have been a set of protocols
+  - Also: WithStates, [WithStyles](https://lit.dev/docs/components/styles/), WithTemplate, etc
 
 </article>
 
@@ -545,7 +545,7 @@ protocol Q extends P {
 ```js
 class C implements Q {
 	[Q.bar]() {}
-	// [Q.foo] or [P.foo]?
+	// [Q.foo] or only [P.foo]?
 }
 ```
 
