@@ -71,12 +71,12 @@
 
 - Both symbol-based and string-based
 - Iteration, Generators
-- toStringable (has a `toString` method)
+- Express capability to convert to…
+  - …a string (`toString`)
+  - …a primitive (`valueOf`, `Symbol.toPrimitive`)
+  - …JSON (`toJSON`)
 - `Object.prototype.toString()` (`Symbol.toStringTag`)
-- to primitive (`valueOf`, `Symbol.toPrimitive`)
-- to JSON (`toJSON`)
-- Thenables, `Symbol.isConcatSpreadable`, `Symbol.unscopables`, ...
-- Regular expression stuff, `Symbol.species` 😱, ...
+- Thenables, `Symbol.isConcatSpreadable`, `Symbol.unscopables`, regular expression stuff, `Symbol.species` 😱, ...
 - ArrayLike, SetLike, MapLike, etc.
 
 </article>
