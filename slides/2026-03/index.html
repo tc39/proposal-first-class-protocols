@@ -580,18 +580,34 @@ class MySlider implements FormAssociated {
 
 </article>
 
-<article class="slide md">
+<article class="slide md columns">
 
 ## Auto-generated string aliases ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
 
+Two directions (concept name TBB, using "with strings" for now):
 
-- Two directions (concept name TBB, using "with strings" for now):
-  1. Extension to implementation syntax
-   - `Protocol.implement(obj, P, { withStrings: true })`
-   - `class C implements P with strings { /* ... */ }`
-  2. Factory function
-   - `Protocol.implement(obj, Protocol.withStrings(P))`
-   - `class C implements Protocol.withStrings(P) { /* ... */ }`
+<section>
+
+### Extension to implementation syntax
+
+```js
+Protocol.implement(obj, P, { withStrings: true });
+
+class C implements P with strings { /* ... */ }
+```
+
+</section>
+<section>
+
+### Factory function
+
+```js
+Protocol.implement(obj, Protocol.withStrings(P));
+
+class C implements Protocol.withStrings(P) { /* ... */ }
+```
+
+</section>
 
 </article>
 
