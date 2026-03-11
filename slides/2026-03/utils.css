@@ -1,3 +1,5 @@
+@import url("https://webplatform.design/talks/common/css/utils.css") layer(utils);
+
 .columns {
 	display: grid;
 	grid-template-columns: repeat(var(--columns, 2), 1fr);

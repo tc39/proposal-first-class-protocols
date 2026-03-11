@@ -1,5 +1,4 @@
 @import url("https://webplatform.design/talks/common/theme.css") layer(theme);
-@import url("https://webplatform.design/talks/common/css/utils.css") layer(utils);
 
 h1, h2, h3, h4, h5, h6 {
 	code {
@@ -8,7 +7,7 @@ h1, h2, h3, h4, h5, h6 {
 		padding: .15em .15em 0;
 	}
 
-	&:has(+ p, + ul, + ol, + pre, + .sbs) {
+	&:has(+ :not(&, section)) {
 		margin-bottom: 2rem;
 	}
 }
@@ -21,8 +20,6 @@ h1, h2, h3, h4, h5, h6 {
 	.slide > h2 + h3 {
 		margin: 0;
 	}
-
-
 }
 
 .slide.columns > pre + pre {
