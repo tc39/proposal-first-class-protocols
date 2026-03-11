@@ -33,7 +33,7 @@
 
 <article class="slide md">
 
-## Today
+## Today's Agenda
 
 - Reminders: getting back up to speed with the proposal
 - Changes since 2018 and current status
@@ -46,19 +46,26 @@
 
 ## Motivation
 
-- Describe well-known interfaces
-- Encourage Symbol-based interfaces
-- No coordination needed (between producers and consumers, or across multiple producers)
-- All the fun and convenience of monkey-patching built-ins, none of the downsides!
-- Gives us a standard way to model and refer to existing built-in protocols like iteration
-- More principled duck typing
+- Describe and name well-known interfaces, including existing built-in protocols like iteration
+- Standardised representation of protocols so they can be consistently introspected and manipulated
 
 </article>
 
 <article class="slide md">
 
-### Motivation continued: real-world use cases
-## Reify existing built-in protocols
+## Design Principles
+
+- Encourage Symbol-based interfaces
+- No coordination needed (between producers and consumers, or across multiple producers)
+- All the fun and convenience of monkey-patching built-ins, none of the downsides!
+- Enable a more principled duck typing
+
+</article>
+
+<article class="slide md">
+
+## Real-world use cases
+### Reify existing built-in protocols
 
 - Both symbol-based and string-based
 - Iteration, Generators
@@ -73,8 +80,8 @@
 
 <article class="slide md">
 
-### Motivation continued: real-world use cases
-## New built-in protocols
+## Real-world use cases
+### New built-in protocols
 
 - Mathematical properties of structures
 - Algebraic structures: groups, lattices, rings, algebras, etc.
@@ -88,8 +95,8 @@
 
 <article class="slide md">
 
-### Motivation continued: real-world use cases
-## DOM
+## Real-world use cases
+### DOM
 
 - `EventTarget` could have been a protocol!
 - Web Components
