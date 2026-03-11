@@ -33,7 +33,7 @@ Champions:
    3. [Protocol flattening: `Protocol.union()`](#protocol-flattening-protocolunion)
 6. [Convenience Features](#convenience-features)
    1. [Specifying and implementing protocols on constructors](#specifying-and-implementing-protocols-on-constructors)
-   2. [Automatically creating string aliases for all provided members](#automatically-creating-string-aliases-for-all-provided-members)
+   2. [Automatically creating string aliases for provided members: `Protocol.withStrings()`](#automatically-creating-string-aliases-for-provided-members-protocolwithstrings)
 7. [Patterns](#patterns)
    1. [Conflict resolution \& disambiguation](#conflict-resolution--disambiguation)
 8. [How can I play with it?](#how-can-i-play-with-it)
@@ -458,10 +458,10 @@ class C { /* ... */ }
 Protocol.implement(C.prototype, Protocol.union(P, Q));
 ```
 
-### Automatically creating string aliases for all provided members
+### Automatically creating string aliases for provided members: `Protocol.withStrings()`
 
 While symbol-based names are the default (and desirable for avoiding conflicts), many use cases require integration with implementors of existing ad hoc protocols that are defined in terms of regular string-named properties.
-By default, the implementing object needs to define mappings between the symbol-based names the protocol defines and the string-based names it wants to expose, which can be tedious.
+By default, the implementing object needs to define mappings between the symbol-based names the protocol defines and the string-based names it wants to expose, which can be tedious, especially when the desired string mappings are identical to the protocol names.
 
 For example, the web platform supports making custom elements form-associated which is currently implemented as a delegation pattern over an `ElementInternals` object.
 If protocols existed, one could imagine a protocol like this provided by the browser:
@@ -501,8 +501,8 @@ This involves *a lot* of boilerplate:
 
 ```js
 class MySlider implements FormAssociated {
-  get [FormAssociated.formValue]() { /* elided */ }
-  set [FormAssociated.formValue](value) { /* elided */ }
+  get [FormAssociated.formValue]() { return this.value; }
+  set [FormAssociated.formValue](value) { this.value = value; }
 
   get labels () { return this[FormAssociated.labels]; }
   get validationMessage () { return this[FormAssociated.validationMessage]; }
@@ -516,18 +516,31 @@ class MySlider implements FormAssociated {
 }
 ```
 
-While protocols *could* define all their provided members as string-named properties, this moves control from the object to the protocol, which is not always desirable.
-In some cases protocols are implemented to add functionality that is primarily meant to be used internally, while in other cases they are meant to also add API that exposes this functionality to consumers.
+While protocols *could* define all their provided members as string-named properties, this moves control from the consumer (object) to the producer (protocol), which is not always desirable.
+The same protocol may be used in different ways, either internally, primarily for the functionality it provides, or exposed to object consumers as API.
 
-To allow for object authors to make that call, protocol syntax supports a convenience syntax that automatically creates string aliases for all provided members as accessors on the implementing object.
+To allow for object authors to make that call on a case by case basis, `Protocol` provides a convenience factory (temporarily named `Protocol.withStrings()` until bikeshedded) function that takes an input protocol and produces an output protocol that includes string aliases for all provided symbol members as accessors.
+The output is memoized: same input protocol → same output protocol.
 
-The exact syntax is TBD, discussed in issue [#47](https://github.com/tc39/proposal-first-class-protocols/issues/47).
+With this function, the example above can be written as:
 
-Some (not necessarily mutually exclusive) ideas include:
-- an extension to the `implements` syntax (e.g. `class C implements Foldable with strings`)
-- a `Protocol.implement()` option (e.g. `Protocol.implement(obj, Foldable, { withStrings: true })`)
-- a method that transforms a protocol into another protocol that also provides string aliases for all provided members (e.g. `class C implements Protocol.withStrings(P)`)
+```js
+class MySlider implements Protocol.withStrings(FormAssociated) {
+  get [FormAssociated.formValue]() { return this.value; }
+  set [FormAssociated.formValue](value) { this.value = value; }
+}
+```
 
+or equivalently:
+
+```js
+class MySlider {
+  get [FormAssociated.formValue]() { return this.value; }
+  set [FormAssociated.formValue](value) { this.value = value; }
+}
+
+Protocol.implement(mySlider, Protocol.withStrings(FormAssociated));
+```
 
 ## Patterns
 
