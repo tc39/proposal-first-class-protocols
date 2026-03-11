@@ -315,7 +315,7 @@ protocol P {
 	bar () {}
 }
 class C implements P {}
-C implements P; // true
+C.prototype implements P; // true
 (new C).bar(); // true
 ```
 
