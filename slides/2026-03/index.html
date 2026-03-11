@@ -474,30 +474,29 @@ class C implements Q {
 
 </article>
 
-<article class="slide md columns">
+<article class="slide md columns dont-resize" id="sub-protocol-members">
 
-## Do sub-protocols create symbols on the parent? ([#81](https://github.com/tc39/proposal-first-class-protocols/issues/81))
+## How to access sub-protocol members? ([#81](https://github.com/tc39/proposal-first-class-protocols/issues/81))
 
 <div>
+
 
 ```js
 protocol P {
 	requires foo implements protocol {
-		// Does this create a P.foo?
 		requires bar;
 	}
 }
 ```
 
-Problem: How to refer to `bar` from the implementing object?
-
+**Problem:** How to refer to `bar` from the implementing object?
 
 </div>
-
 <div>
 
+
 - `Protocol.describe(Protocol.describe(P).members.foo).members.bar` is *extremely* unwieldy. 🤢
-- Can't just do `P.foo`, that would conflict with `P`’s own `foo` member
+- `P.bar`? Conflicts with `P`’s direct members
 - `P[P.foo].bar`?
 - `P.foo.bar`?
 

@@ -66,3 +66,9 @@ h1, h2, h3, h4, h5, h6 {
 		display: block;
 	}
 }
+
+#sub-protocol-members {
+	div li > code {
+		word-break: break-all;
+	}
+}
