@@ -423,11 +423,24 @@ Protocol.describe(P);
 
 <article class="slide md">
 
-## Protocol composition
+## Should `constructor` and `prototype` be automatically strings? ([#84](https://github.com/tc39/proposal-first-class-protocols/issues/84))
+
+- We don't want `P.constructor` and `P.prototype` symbols!
+- Frequently needed: now the only way to provide/require static members
+- Why create an error condition when we can just handle it?
+- But would that complicate the mental model too much?
+
+</article>
+
+<article class="slide md">
+
+## Protocol inheritance
 
 - `extends`, `implements`, both?
 - If `extends`, does it use the prototype chain?
 - If `extends`, does it support one or multiple parent protocols?
+  - If multiple, inconsistent `extends` in constructors
+  - If one, limited utility
 
 </article>
 
@@ -435,19 +448,29 @@ Protocol.describe(P);
 
 ## How are parent symbols accessed? ([#23](https://github.com/tc39/proposal-first-class-protocols/issues/23))
 
+<div class="sbs">
+
 ```js
 protocol P {
 	requires foo() {}
 }
-// Or implements P
+```
+
+```js
 protocol Q extends P {
+	// Or Q implements P
 	requires bar() {}
 }
+```
+
+```js
 class C implements Q {
 	[Q.bar]() {}
 	// [Q.foo] or [P.foo]?
 }
 ```
+
+</div>
 
 </article>
 
@@ -459,46 +482,29 @@ class C implements Q {
 
 ```js
 protocol P {
-	requires constructor implements protocol {
+	requires foo implements protocol {
 		// Does this create a P.foo?
-		requires foo;
+		requires bar;
 	}
 }
 ```
 
-Problem:
-`Protocol.describe(Protocol.describe(P).members.constructor).members.foo` is *extremely* unwieldy.
+Problem: How to refer to `bar` from the implementing object?
+
 
 </div>
 
 <div>
 
-But if sub-protocols do create symbols on the parent, then what about:
-
-```js
-protocol P {
-	requires foo;
-
-	requires constructor implements protocol {
-		requires foo;
-	}
-}
-```
+- `Protocol.describe(Protocol.describe(P).members.foo).members.bar` is *extremely* unwieldy. 🤢
+- Can't just do `P.foo`, that would conflict with `P`’s own `foo` member
+- `P[P.foo].bar`?
+- `P.foo.bar`?
 
 </div>
 
 </article>
 
-<article class="slide md">
-
-## Should `constructor` and `prototype` be automatically strings? ([#84](https://github.com/tc39/proposal-first-class-protocols/issues/84))
-
-- We don't want `P.constructor` and `P.prototype` symbols!
-- Frequently needed: now the only way to provide/require static members
-- Why create an error condition when we can just handle it?
-- But would that complicate the mental model too much?
-
-</article>
 
 <!-- <article class="slide md">
 
