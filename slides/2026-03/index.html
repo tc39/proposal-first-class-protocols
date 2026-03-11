@@ -379,6 +379,77 @@ protocol P {
 
 </article>
 
+<article class="slide md columns" id="with-strings">
+
+## Auto-generated string aliases ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
+### Motivation
+
+```js
+protocol FormAssociated {
+	requires formValue;
+
+	get form() { /* elided */ }
+	get labels() { /* elided */ }
+	get validationMessage() { /* elided */ }
+	get validity() { /* elided */ }
+	get willValidate() { /* elided */ }
+	checkValidity() { /* elided */ }
+	reportValidity() { /* elided */ }
+	setCustomValidity(message) { /* elided */ }
+	setValidity(validity) { /* elided */ }
+	// ...
+}
+```
+
+<div class="frame-by-frame forwards delayed-children">
+
+```js
+class MySlider implements FormAssociated {
+  get [FormAssociated.formValue]() { return this.value; }
+  set [FormAssociated.formValue](value) { this.value = value; }
+}
+```
+```js
+class MySlider implements FormAssociated {
+  get [FormAssociated.formValue]() { return this.value; }
+  set [FormAssociated.formValue](value) { this.value = value; }
+
+  get labels () { return this[FormAssociated.labels]; }
+  get validationMessage () { return this[FormAssociated.validationMessage]; }
+  get validity () { return this[FormAssociated.validity]; }
+  get willValidate () { return this[FormAssociated.willValidate]; }
+  get checkValidity () { return this[FormAssociated.checkValidity]; }
+  get reportValidity () { return this[FormAssociated.reportValidity]; }
+  get setCustomValidity () { return this[FormAssociated.setCustomValidity]; }
+  get setValidity () { return this[FormAssociated.setValidity]; }
+  // ...
+}
+```
+
+</div>
+
+- The protocol _could_ define all provided members as strings, but that moves control from consumer to producer
+- What if it were a property of the _implementation_ (i.e. the protocol → object relationship)?
+{ .full-width .delayed }
+
+</article>
+
+<article class="slide md">
+
+## Auto-generated string aliases via factory
+
+```js
+Protocol.implement(obj, Protocol.withStrings(P));
+class C implements Protocol.withStrings(P) { /* ... */ }
+```
+
+- Name TBB (help?)
+- Takes a protocol and returns a new protocol that includes string accessors for all provided members
+- **Memoized**: same input protocol → same output protocol
+- Later we could even add options to customize mappings
+
+</article>
+
 </section>
 
 <section>
@@ -389,12 +460,10 @@ protocol P {
 ## Open questions
 
 - Are `"foo"` and `foo` distinct members?
-- How does inheritance work?
+- Inheritance: `extends`, `implements`, both?
 - How are parent symbols accessed?
 - Do sub-protocols create symbols on the parent?
-- Should `constructor` and `prototype` be equivalent to `["constructor"]` and `["prototype"]`?
-- What does `super.prop` resolve to, if anything?
-- Auto-generated string aliases — how?
+- Should `constructor` and `prototype` be automatically strings?
 
 </article>
 
@@ -525,91 +594,7 @@ Resolves as expected in most cases, but possibly too weird?
 
 </article> -->
 
-<article class="slide md columns" id="with-strings">
 
-## Auto-generated string aliases ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
-### Motivation
-
-```js
-protocol FormAssociated {
-	requires formValue;
-
-	get form() { /* elided */ }
-	get labels() { /* elided */ }
-	get validationMessage() { /* elided */ }
-	get validity() { /* elided */ }
-	get willValidate() { /* elided */ }
-	checkValidity() { /* elided */ }
-	reportValidity() { /* elided */ }
-	setCustomValidity(message) { /* elided */ }
-	setValidity(validity) { /* elided */ }
-	// ...
-}
-```
-
-<div class="frame-by-frame forwards delayed-children">
-
-```js
-class MySlider implements FormAssociated {
-  get [FormAssociated.formValue]() { return this.value; }
-  set [FormAssociated.formValue](value) { this.value = value; }
-}
-```
-```js
-class MySlider implements FormAssociated {
-  get [FormAssociated.formValue]() { return this.value; }
-  set [FormAssociated.formValue](value) { this.value = value; }
-
-  get labels () { return this[FormAssociated.labels]; }
-  get validationMessage () { return this[FormAssociated.validationMessage]; }
-  get validity () { return this[FormAssociated.validity]; }
-  get willValidate () { return this[FormAssociated.willValidate]; }
-  get checkValidity () { return this[FormAssociated.checkValidity]; }
-  get reportValidity () { return this[FormAssociated.reportValidity]; }
-  get setCustomValidity () { return this[FormAssociated.setCustomValidity]; }
-  get setValidity () { return this[FormAssociated.setValidity]; }
-  // ...
-}
-```
-
-</div>
-
-- The protocol _could_ define all provided members as strings, but that moves control from consumer to producer
-- What if it were a property of the _implementation_? But how?
-{ .full-width .delayed }
-
-</article>
-
-<article class="slide md columns">
-
-## Auto-generated string aliases ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
-
-Two directions (concept name TBB, using "with strings" for now):
-
-<section>
-
-### Extension to implementation syntax
-
-```js
-Protocol.implement(obj, P, { withStrings: true });
-
-class C implements P with strings { /* ... */ }
-```
-
-</section>
-<section>
-
-### Factory function
-
-```js
-Protocol.implement(obj, Protocol.withStrings(P));
-
-class C implements Protocol.withStrings(P) { /* ... */ }
-```
-
-</section>
-
-</article>
 
 </section>
 
