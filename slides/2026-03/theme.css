@@ -1,0 +1,48 @@
+@import url("https://webplatform.design/talks/common/theme.css") layer(theme);
+@import url("https://webplatform.design/talks/common/css/utils.css") layer(utils);
+
+h1, h2, h3, h4, h5, h6 {
+	code {
+		font-weight: inherit;
+
+		padding: .15em .15em 0;
+	}
+
+	&:has(+ p, + ul, + ol, + pre, + .sbs) {
+		margin-bottom: 2rem;
+	}
+}
+
+@layer theme {
+	.slide:has(h2) h3 {
+		font-size: calc(1.4 * var(--slide-base-font-size, 1rem));
+	}
+
+	.slide > h2 + h3 {
+		margin: 0;
+	}
+
+
+}
+
+.slide.columns > pre + pre {
+	margin-top: 0;
+}
+
+[data-steps] {
+	.collapse[data-step],
+	.collapse[data-step-from] {
+		display: none;
+	}
+
+	&[data-step-all$="0"] .collapse[data-step="0"],
+	&[data-step-all$="1"] .collapse[data-step="1"],
+	&[data-step-all$="2"] .collapse[data-step="2"],
+	&[data-step-all$="3"] .collapse[data-step="3"],
+	&[data-step-all~="0"] .collapse[data-step-from="0"],
+	&[data-step-all~="1"] .collapse[data-step-from="1"],
+	&[data-step-all~="2"] .collapse[data-step-from="2"],
+	&[data-step-all~="3"] .collapse[data-step-from="3"] {
+		display: block;
+	}
+}

@@ -1,6 +1,7 @@
 .columns {
 	display: grid;
 	grid-template-columns: repeat(var(--columns, 2), 1fr);
+	align-content: center;
 	gap: 0 2rem;
 
 	/* First heading */
@@ -8,5 +9,32 @@
 	> p,
 	> .full-width {
 		grid-column: 1 / -1;
+	}
+}
+
+
+.frame-by-frame {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+
+	> * {
+		/* Make them overlap while still occupying space */
+		grid-column: 1;
+		grid-row: 1;
+		opacity: 0;
+		visibility: hidden;
+		transition-duration: 200ms;
+		transition-property: opacity, visibility;
+	}
+
+	&.backwards:not(:has(.current, .displayed)) > :first-child,
+	& > .current,
+	&.forwards:not(:has(.current)):has(.displayed) > :nth-last-child(1 of .displayed) {
+		position: relative;
+		z-index: 1;
+		opacity: 1;
+		visibility: visible;
+		transition-delay: 0s;
 	}
 }

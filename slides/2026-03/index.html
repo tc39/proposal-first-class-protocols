@@ -128,7 +128,7 @@ protocol Foldable {
 
 ### Implementing a protocol
 
-```js { data-step="1" }
+```js
 class C implements Foldable {
   [Foldable.foldr](f, memo) { /* ... */ }
 }
@@ -525,7 +525,7 @@ Resolves as expected in most cases, but possibly too weird?
 
 </article> -->
 
-<article class="slide md columns" data-steps="3" id="with-strings">
+<article class="slide md columns" id="with-strings">
 
 ## Auto-generated string aliases ([#47](https://github.com/tc39/proposal-first-class-protocols/issues/47))
 ### Motivation
@@ -547,13 +547,15 @@ protocol FormAssociated {
 }
 ```
 
-```js { data-step="1" }
+<div class="frame-by-frame forwards delayed-children">
+
+```js
 class MySlider implements FormAssociated {
   get [FormAssociated.formValue]() { return this.value; }
   set [FormAssociated.formValue](value) { this.value = value; }
 }
 ```
-```js { data-step-from="2" }
+```js
 class MySlider implements FormAssociated {
   get [FormAssociated.formValue]() { return this.value; }
   set [FormAssociated.formValue](value) { this.value = value; }
@@ -570,9 +572,11 @@ class MySlider implements FormAssociated {
 }
 ```
 
+</div>
+
 - The protocol _could_ define all provided members as strings, but that moves control from consumer to producer
 - What if it were a property of the _implementation_? But how?
-{ .full-width data-step="3" }
+{ .full-width .delayed }
 
 </article>
 
